@@ -1,0 +1,34 @@
+cmake_minimum_required(VERSION 2.8.3)
+project(joystick_vehicle_test)
+
+add_definitions(-std=c++11 -Wall -Wextra)
+
+## Find catkin and any catkin packages
+find_package(catkin REQUIRED COMPONENTS
+    roscpp
+    std_msgs
+    genmsg
+    automation_msgs
+    highway_msgs
+    )
+
+## Declare a catkin package
+catkin_package(CATKIN_DEPENDS
+    std_msgs
+    automation_msgs
+    highway_msgs
+    )
+
+## Build executables
+include_directories(include
+    ${catkin_INCLUDE_DIRS}
+    )
+
+add_executable(joystick_vehicle_test
+    ${CMAKE_SOURCE_DIR}/src/joystick_vehicle_test_ros.cpp
+    )
+
+target_link_libraries(joystick_vehicle_test ${catkin_LIBRARIES} ASCommon)
+add_dependencies(joystick_vehicle_test ${catkin_EXPORTED_TARGETS})
+
+

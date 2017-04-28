@@ -1,0 +1,27 @@
+{
+    "publish_interval": 0.05,
+
+    "joy_fault_timeout": 3.0,
+
+    "engage_button": 7,
+    "disengage_button": 6,
+
+    "park_button": 3,
+    "neutral_button": 2,
+    "drive_button": 0,
+
+    "right_turn_button": 5,
+    "left_turn_button": 4,
+
+    "speed_axes": 7,
+    "speed_up_sign": 1,
+    "speed_step": 0.44704,
+    "speed_max": 4.4704,
+    "acceleration_limit": 2.0,
+    "deceleration_limit": 1.5,
+
+    "steering_axes": 3,
+    "steering_sign": 1.0,
+    "steering_gain": 0.12,
+    "max_curvature_rate": 0.2
+}
