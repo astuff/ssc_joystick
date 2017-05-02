@@ -42,7 +42,7 @@
             args="-f $(find ds_veh_controller)/core_ds_veh_controller/ds_veh_controller.json" />
 
         <node pkg="ds_veh_controller" type="ds_veh_interface" name="veh_interface"
-            args="-f $(find silver_fusion_demo_launch)/launch/ds_veh_interface_fusion.json" />
+            args="-f $(find ds_veh_controller)/core_ds_veh_controller/ds_veh_interface.json" />
     </group>
 
 </launch>
