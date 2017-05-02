@@ -31,4 +31,12 @@ add_executable(joystick_vehicle_test
 target_link_libraries(joystick_vehicle_test ${catkin_LIBRARIES} ASCommon)
 add_dependencies(joystick_vehicle_test ${catkin_EXPORTED_TARGETS})
 
+install(TARGETS ${PROJECT_NAME}
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
+install(DIRECTORY launch/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+)
