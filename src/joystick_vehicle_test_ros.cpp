@@ -369,7 +369,7 @@ int main(int argc, char **argv)
     // Send output messages
     speed_msg.header.stamp = now;
     speed_msg.mode = engaged;
-    speed_msg.speed = desired_speed / 0.44704f;
+    speed_msg.speed = desired_speed * 0.44704f;
     speed_msg.acceleration_limit = acceleration_limit;
     speed_msg.deceleration_limit = deceleration_limit;
     speed_pub.publish(speed_msg);

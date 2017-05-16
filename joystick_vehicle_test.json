@@ -16,13 +16,13 @@
     "speed_axes": 7,
     "speed_up_sign": 1,
     "speed_step": 1.0,
-    "speed_max": 10.0,
+    "speed_max": 15.0,
     "acceleration_limit": 2.0,
-    "deceleration_limit": 2.0,
+    "deceleration_limit": 2.5,
 
     "steering_axes": 3,
     "steering_sign": 1.0,
-    "steering_gain": 0.12,
-    "steering_exponent": 1.5,
+    "steering_gain": 0.11,
+    "steering_exponent": 2.5,
     "max_curvature_rate": 0.2
 }
