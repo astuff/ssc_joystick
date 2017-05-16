@@ -54,6 +54,7 @@ float deceleration_limit = 0.0;
 int steering_axes = -1;
 float steering_sign = 0.0;
 float steering_gain = 0.0;
+float steering_exponent = 0.0;
 float max_curvature_rate = 0.0;
 
 uint16_t engaged = 0;
@@ -162,7 +163,14 @@ void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
     float steering = msg->axes.at((unsigned int) steering_axes);
     if ((steering > 0.01) || (steering < -0.01))
     {
-      desired_curvature = steering * steering_gain * steering_sign;
+      float raw = steering * steering_sign;
+      float raw_sign = 1.0f;
+      if (raw < 0.0)
+      {
+        raw *= -1.0f;
+        raw_sign = -1.0f;
+      }
+      desired_curvature = pow(raw, steering_exponent) * steering_gain * raw_sign;
     }
     else
     {
@@ -272,6 +280,7 @@ int main(int argc, char **argv)
       steering_axes = json_obj["steering_axes"];
       steering_sign = json_obj["steering_sign"];
       steering_gain = json_obj["steering_gain"];
+      steering_exponent = json_obj["steering_exponent"];
       max_curvature_rate = json_obj["max_curvature_rate"];
     }
     catch (const std::exception &e)
@@ -303,6 +312,7 @@ int main(int argc, char **argv)
         steering_axes < 0 ||
         steering_sign == 0 ||
         steering_gain == 0 ||
+        steering_exponent == 0 ||
         max_curvature_rate == 0)
     {
       cout << endl;
@@ -359,7 +369,7 @@ int main(int argc, char **argv)
     // Send output messages
     speed_msg.header.stamp = now;
     speed_msg.mode = engaged;
-    speed_msg.speed = desired_speed;
+    speed_msg.speed = desired_speed / 0.44704f;
     speed_msg.acceleration_limit = acceleration_limit;
     speed_msg.deceleration_limit = deceleration_limit;
     speed_pub.publish(speed_msg);
