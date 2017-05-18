@@ -86,13 +86,17 @@ void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
     }
     engaged = 0;
   }
-  else if (dbw_ok && (msg->buttons.at((unsigned int) engage_button) > 0))
+  else if (msg->buttons.at((unsigned int) engage_button) > 0)
   {
-    if (engaged == 0)
+    if (!dbw_ok)
+    {
+      cout << "System not ready to engage" << endl;
+    }
+    else if (engaged == 0)
     {
       cout << "ENGAGED" << endl;
+      engaged = 1;
     }
-    engaged = 1;
   }
 
   if (engaged > 0)
@@ -218,15 +222,19 @@ void misc1Callback(const dbw_mkz_msgs::Misc1Report::ConstPtr& msg)
     }
     engaged = 0;
   }
-  else if (dbw_ok && msg->btn_cc_set_dec && msg->btn_cc_gap_dec)
+  else if (msg->btn_cc_set_dec && msg->btn_cc_gap_dec)
   {
-    if (engaged == 0)
+    if (!dbw_ok)
+    {
+      cout << "System not ready to engage" << endl;
+    }
+    else if (engaged == 0)
     {
       cout << "ENGAGED" << endl;
+      engaged = 1;
       desired_speed = 0.0;
       desired_curvature = 0.0;
     }
-    engaged = 1;
   }
 }
 
@@ -405,6 +413,7 @@ int main(int argc, char **argv)
   ros::Publisher steer_pub = n.advertise<highway_msgs::SteerMode>("arbitrated_steering_commands", 1);
 
   // Subscribe to messages to read
+  ros::Subscriber state_sub = n.subscribe("module_states", 5, moduleStateCallback);
   ros::Subscriber joy_sub = n.subscribe("joy", 5, joystickCallback);
   ros::Subscriber joy_fault_sub = n.subscribe("diagnostics", 1, diagnosticCallback);
   ros::Subscriber misc1_sub = n.subscribe("misc_1_report", 1, misc1Callback);

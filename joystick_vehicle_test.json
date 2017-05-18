@@ -3,6 +3,8 @@
 
     "joy_fault_timeout": 3.0,
 
+    "vel_controller_name": "/as/veh_controller",
+
     "engage_button": 7,
     "disengage_button": 6,
 
