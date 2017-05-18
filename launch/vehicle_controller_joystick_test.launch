@@ -17,6 +17,7 @@
     <remap from="/as/turn_signal_cmd" to="/vehicle/turn_signal_cmd" />
     <remap from="/as/gear_cmd" to="/vehicle/gear_cmd" />
     <remap from="/as/wheel_speed_report" to="/vehicle/wheel_speed_report" />
+    <remap from="/as/misc_1_report" to="/vehicle/misc_1_report" />
 
     <include file="$(find dbw_mkz_can)/launch/dbw.launch">
         <arg name="twist_use_pedals" value="False"/>

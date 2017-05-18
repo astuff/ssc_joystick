@@ -14,10 +14,12 @@
   <build_depend>std_msgs</build_depend>
   <build_depend>automation_msgs</build_depend>
   <build_depend>highway_msgs</build_depend>
+  <build_depend>dbw_mkz_msgs</build_depend>
 
   <run_depend>roscpp</run_depend>
   <run_depend>std_msgs</run_depend>
   <run_depend>automation_msgs</run_depend>
   <run_depend>highway_msgs</run_depend>
+  <run_depend>dbw_mkz_msgs</run_depend>
 
 </package>

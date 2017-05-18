@@ -24,8 +24,11 @@
 
 #include <automation_msgs/GearCommand.h>
 #include <automation_msgs/TurnSignalCommand.h>
+#include <automation_msgs/ModuleState.h>
 #include <highway_msgs/SpeedMode.h>
 #include <highway_msgs/SteerMode.h>
+
+#include <dbw_mkz_msgs/Misc1Report.h>
 
 #include <Json.hpp>
 
@@ -57,6 +60,9 @@ float steering_gain = 0.0;
 float steering_exponent = 0.0;
 float max_curvature_rate = 0.0;
 
+string vel_controller_name = "";
+
+bool dbw_ok = false;
 uint16_t engaged = 0;
 double last_joystick_msg = 0.0;
 int speed_last = 0;
@@ -80,7 +86,7 @@ void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
     }
     engaged = 0;
   }
-  else if (msg->buttons.at((unsigned int) engage_button) > 0)
+  else if (dbw_ok && (msg->buttons.at((unsigned int) engage_button) > 0))
   {
     if (engaged == 0)
     {
@@ -200,6 +206,64 @@ void diagnosticCallback(const diagnostic_msgs::DiagnosticArray::ConstPtr& msg)
   }
 }
 
+void misc1Callback(const dbw_mkz_msgs::Misc1Report::ConstPtr& msg)
+{
+  if (msg->btn_cc_set_inc && msg->btn_cc_gap_inc)
+  {
+    if (engaged > 0)
+    {
+      cout << "DISENGAGED" << endl;
+      desired_speed = 0.0;
+      desired_curvature = 0.0;
+    }
+    engaged = 0;
+  }
+  else if (dbw_ok && msg->btn_cc_set_dec && msg->btn_cc_gap_dec)
+  {
+    if (engaged == 0)
+    {
+      cout << "ENGAGED" << endl;
+      desired_speed = 0.0;
+      desired_curvature = 0.0;
+    }
+    engaged = 1;
+  }
+}
+
+void moduleStateCallback(const automation_msgs::ModuleState::ConstPtr& msg)
+{
+  if (msg->name == vel_controller_name)
+  {
+    if (msg->state == "not_ready")
+    {
+      dbw_ok = false;
+    }
+    else if ((msg->state == "ready") || (msg->state == "engaged") || (msg->state == "active"))
+    {
+      dbw_ok = true;
+    }
+    else if (msg->state == "failure")
+    {
+      if (dbw_ok && (engaged > 0))
+      {
+        cout << "Joystick control DISENGAGED due to " << msg->info << endl;
+        engaged = 0;
+      }
+      dbw_ok = false;
+    }
+    else if (msg->state == "fatal")
+    {
+      if (dbw_ok)
+      {
+        cout << "Joystick control unavailable due to " << msg->info << endl;
+        cout << "Software must be stopped and restarted once the problem is fixed" << endl;
+        engaged = 0;
+      }
+      dbw_ok = false;
+    }
+  }
+}
+
 // Main routine
 int main(int argc, char **argv)
 {
@@ -260,6 +324,8 @@ int main(int argc, char **argv)
 
       joy_fault_timeout = json_obj["joy_fault_timeout"];
 
+      vel_controller_name = json_obj["vel_controller_name"];
+
       engage_button = json_obj["engage_button"];
       disengage_button = json_obj["disengage_button"];
 
@@ -291,6 +357,8 @@ int main(int argc, char **argv)
     if (publish_interval <= 0.0 ||
 
         joy_fault_timeout <= 0 ||
+
+        vel_controller_name.empty() ||
 
         engage_button < 0 ||
         disengage_button < 0 ||
@@ -339,6 +407,7 @@ int main(int argc, char **argv)
   // Subscribe to messages to read
   ros::Subscriber joy_sub = n.subscribe("joy", 5, joystickCallback);
   ros::Subscriber joy_fault_sub = n.subscribe("diagnostics", 1, diagnosticCallback);
+  ros::Subscriber misc1_sub = n.subscribe("misc_1_report", 1, misc1Callback);
 
   // Wait for time to be valid
   while (ros::Time::now().nsec == 0);

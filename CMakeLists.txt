@@ -10,6 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
     genmsg
     automation_msgs
     highway_msgs
+    dbw_mkz_msgs
     )
 
 ## Declare a catkin package
@@ -17,6 +18,7 @@ catkin_package(CATKIN_DEPENDS
     std_msgs
     automation_msgs
     highway_msgs
+    dbw_mkz_msgs
     )
 
 ## Build executables
