@@ -16,6 +16,7 @@
     <remap from="/as/throttle_report" to="/vehicle/throttle_report" />
     <remap from="/as/turn_signal_cmd" to="/vehicle/turn_signal_cmd" />
     <remap from="/as/gear_cmd" to="/vehicle/gear_cmd" />
+    <remap from="/as/gear_report" to="/vehicle/gear_report" />
     <remap from="/as/wheel_speed_report" to="/vehicle/wheel_speed_report" />
     <remap from="/as/misc_1_report" to="/vehicle/misc_1_report" />
 

@@ -70,6 +70,7 @@ string vel_controller_name = "";
 
 bool dbw_ok = false;
 uint16_t engaged = 0;
+bool engage_pressed = false;
 double last_joystick_msg = 0.0;
 int speed_last = 0;
 float desired_speed = 0.0;
@@ -104,7 +105,7 @@ void tryToEngage()
   {
     cout << "Drive by wire system not ready to engage" << endl;
   }
-  else if ((current_gear != automation_msgs::Gear::PARK) ||
+  else if ((current_gear != automation_msgs::Gear::PARK) &&
            (current_gear != automation_msgs::Gear::NEUTRAL))
   {
     cout << "Gear must be in park or neutral to engage" << endl;
@@ -122,22 +123,31 @@ void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
   if ((msg->buttons.at((unsigned int) engage1_button) > 0) &&
       (msg->buttons.at((unsigned int) engage2_button) > 0))
   {
-    if (engaged > 0)
+    if (!engage_pressed)
     {
-      disengage();
-    }
-    else
-    {
-      tryToEngage();
-    }
-  }
+      if (engaged > 0)
+      {
+        disengage();
+      }
+      else
+      {
+        tryToEngage();
+      }
+      engage_pressed = true;
+    } 
+ }
   else if ((msg->buttons.at((unsigned int) engage1_button) > 0) ||
            (msg->buttons.at((unsigned int) engage2_button) > 0))
   {
-    if (engaged > 0)
+    if ((engaged > 0) && !engage_pressed)
     {
       disengage();
+      engage_pressed = true;
     }
+  }
+  else
+  {
+    engage_pressed = false;
   }
 
   if (engaged > 0)
