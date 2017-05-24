@@ -23,22 +23,25 @@
 #include <automation_msgs/ModuleState.h>
 
 #include <automation_msgs/GearCommand.h>
+#include <automation_msgs/GearFeedback.h>
 #include <automation_msgs/TurnSignalCommand.h>
 #include <automation_msgs/ModuleState.h>
 #include <highway_msgs/SpeedMode.h>
 #include <highway_msgs/SteerMode.h>
+#include <automation_msgs/VelocityAccel.h>
 
 #include <dbw_mkz_msgs/Misc1Report.h>
 
 #include <Json.hpp>
+#include <GeneralUtils.hpp>
 
 using namespace std;
 using namespace AS;
 
 double joy_fault_timeout = 0.0;
 
-int engage_button = -1;
-int disengage_button = -1;
+int engage1_button = -1;
+int engage2_button = -1;
 
 int park_button = -1;
 int neutral_button = -1;
@@ -53,6 +56,9 @@ float speed_step = 0.0;
 float speed_max = 0.0;
 float acceleration_limit = 0.0;
 float deceleration_limit = 0.0;
+int brake_axes = -1;
+float brake_sign = 0.0;
+float max_deceleration_limit = 0.0;
 
 int steering_axes = -1;
 float steering_sign = 0.0;
@@ -68,6 +74,12 @@ double last_joystick_msg = 0.0;
 int speed_last = 0;
 float desired_speed = 0.0;
 float desired_curvature = 0.0;
+bool brake_inited = false; // Brake axes default is 0 (50%) until it's pressed
+bool brake_active = false;
+float deceleration = 0.0;
+
+uint8_t current_gear = automation_msgs::Gear::NONE;
+float current_velocity = 1.0;
 
 automation_msgs::GearCommand gear_command_msg;
 ros::Publisher gear_command_pub;
@@ -75,27 +87,56 @@ ros::Publisher gear_command_pub;
 automation_msgs::TurnSignalCommand turn_signal_command_msg;
 ros::Publisher turn_signal_command_pub;
 
+void disengage()
+{
+  cout << "DISENGAGED" << endl;
+  engaged = 0;
+  if ((current_gear == automation_msgs::Gear::DRIVE) && (current_velocity < 0.01))
+  {
+    gear_command_msg.command.gear = automation_msgs::Gear::PARK;
+    gear_command_pub.publish(gear_command_msg);
+  }
+}
+
+void tryToEngage()
+{
+  if (!dbw_ok)
+  {
+    cout << "Drive by wire system not ready to engage" << endl;
+  }
+  else if ((current_gear != automation_msgs::Gear::PARK) ||
+           (current_gear != automation_msgs::Gear::NEUTRAL))
+  {
+    cout << "Gear must be in park or neutral to engage" << endl;
+  }
+  else
+  {
+    cout << "ENGAGED" << endl;
+    engaged = 1;
+  }
+}
+
 // Callback functions
 void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
 {
-  if (msg->buttons.at((unsigned int) disengage_button) > 0)
+  if ((msg->buttons.at((unsigned int) engage1_button) > 0) &&
+      (msg->buttons.at((unsigned int) engage2_button) > 0))
   {
     if (engaged > 0)
     {
-      cout << "DISENGAGED" << endl;
+      disengage();
     }
-    engaged = 0;
+    else
+    {
+      tryToEngage();
+    }
   }
-  else if (msg->buttons.at((unsigned int) engage_button) > 0)
+  else if ((msg->buttons.at((unsigned int) engage1_button) > 0) ||
+           (msg->buttons.at((unsigned int) engage2_button) > 0))
   {
-    if (!dbw_ok)
+    if (engaged > 0)
     {
-      cout << "System not ready to engage" << endl;
-    }
-    else if (engaged == 0)
-    {
-      cout << "ENGAGED" << endl;
-      engaged = 1;
+      disengage();
     }
   }
 
@@ -103,7 +144,14 @@ void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
   {
     if (msg->buttons.at((unsigned int) park_button) > 0)
     {
-      gear_command_msg.command.gear = automation_msgs::Gear::PARK;
+      if (current_velocity > 0.1)
+      {
+        cout << "Must be stopped to change to park" << endl;
+      }
+      else
+      {
+        gear_command_msg.command.gear = automation_msgs::Gear::PARK;
+      }
     }
     else if (msg->buttons.at((unsigned int) neutral_button) > 0)
     {
@@ -156,6 +204,34 @@ void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
       speed_last = 0;
     }
 
+    float brake = msg->axes.at((unsigned int) brake_axes);
+    if (brake != 0.0) brake_inited = true;
+    if (brake_inited)
+    {
+      brake *= brake_sign;
+      if (brake < 0.95)
+      {
+        if (!brake_active)
+        {
+          brake_active = true;
+          desired_speed = 0.0;
+          speed_updated = true;
+        }
+        deceleration = (float) map2pt(brake, -0.95, 0.95, max_deceleration_limit, deceleration_limit);
+      }
+      else
+      {
+        if (brake_active)
+        {
+          brake_active = false;
+          desired_speed = current_velocity / 0.44704f;
+          desired_speed = speed_step * floor(desired_speed / speed_step);
+          speed_updated = true;
+          deceleration = deceleration_limit;
+        }
+      }
+    }
+
     if (speed_updated)
     {
       if (desired_speed > speed_max)
@@ -205,9 +281,21 @@ void diagnosticCallback(const diagnostic_msgs::DiagnosticArray::ConstPtr& msg)
       {
         cout << "JOYSTICK FAULT" << endl;
         engaged = 0;
+        brake_inited = false;
+        brake_active = false;
       }
     }
   }
+}
+
+void gearFeedbackCallback(const automation_msgs::GearFeedback::ConstPtr& msg)
+{
+  current_gear = msg->current_gear.gear;
+}
+
+void velocityCallback(const automation_msgs::VelocityAccel::ConstPtr& msg)
+{
+  current_velocity = msg->velocity;
 }
 
 void misc1Callback(const dbw_mkz_msgs::Misc1Report::ConstPtr& msg)
@@ -216,11 +304,8 @@ void misc1Callback(const dbw_mkz_msgs::Misc1Report::ConstPtr& msg)
   {
     if (engaged > 0)
     {
-      cout << "DISENGAGED" << endl;
-      desired_speed = 0.0;
-      desired_curvature = 0.0;
+      disengage();
     }
-    engaged = 0;
   }
   else if (msg->btn_cc_set_dec && msg->btn_cc_gap_dec)
   {
@@ -334,8 +419,8 @@ int main(int argc, char **argv)
 
       vel_controller_name = json_obj["vel_controller_name"];
 
-      engage_button = json_obj["engage_button"];
-      disengage_button = json_obj["disengage_button"];
+      engage1_button = json_obj["engage1_button"];
+      engage2_button = json_obj["engage2_button"];
 
       park_button = json_obj["park_button"];
       neutral_button = json_obj["neutral_button"];
@@ -350,6 +435,9 @@ int main(int argc, char **argv)
       speed_max = json_obj["speed_max"];
       acceleration_limit = json_obj["acceleration_limit"];
       deceleration_limit = json_obj["deceleration_limit"];
+      brake_axes = json_obj["brake_axes"];
+      brake_sign = json_obj["brake_sign"];
+      max_deceleration_limit = json_obj["max_deceleration_limit"];
 
       steering_axes = json_obj["steering_axes"];
       steering_sign = json_obj["steering_sign"];
@@ -368,8 +456,8 @@ int main(int argc, char **argv)
 
         vel_controller_name.empty() ||
 
-        engage_button < 0 ||
-        disengage_button < 0 ||
+        engage1_button < 0 ||
+        engage2_button < 0 ||
 
         park_button < 0 ||
         neutral_button < 0 ||
@@ -384,6 +472,9 @@ int main(int argc, char **argv)
         speed_max == 0 ||
         acceleration_limit == 0 ||
         deceleration_limit == 0 ||
+        brake_axes < 0 ||
+        brake_sign == 0 ||
+        max_deceleration_limit == 0 ||
 
         steering_axes < 0 ||
         steering_sign == 0 ||
@@ -397,6 +488,8 @@ int main(int argc, char **argv)
       exit = true;
     }
   }
+
+  deceleration = deceleration_limit;
 
   if (exit)
     return 0;
@@ -416,6 +509,8 @@ int main(int argc, char **argv)
   ros::Subscriber state_sub = n.subscribe("module_states", 5, moduleStateCallback);
   ros::Subscriber joy_sub = n.subscribe("joy", 5, joystickCallback);
   ros::Subscriber joy_fault_sub = n.subscribe("diagnostics", 1, diagnosticCallback);
+  ros::Subscriber gear_sub = n.subscribe("gear_feedback", 1, gearFeedbackCallback);
+  ros::Subscriber velocity_sub = n.subscribe("velocity_accel", 1, velocityCallback);
   ros::Subscriber misc1_sub = n.subscribe("misc_1_report", 1, misc1Callback);
 
   // Wait for time to be valid
@@ -449,7 +544,7 @@ int main(int argc, char **argv)
     speed_msg.mode = engaged;
     speed_msg.speed = desired_speed * 0.44704f;
     speed_msg.acceleration_limit = acceleration_limit;
-    speed_msg.deceleration_limit = deceleration_limit;
+    speed_msg.deceleration_limit = deceleration;
     speed_pub.publish(speed_msg);
 
     steer_msg.header.stamp = now;

@@ -5,8 +5,8 @@
 
     "vel_controller_name": "/as/veh_controller",
 
-    "engage_button": 7,
-    "disengage_button": 6,
+    "engage1_button": 6,
+    "engage2_button": 7,
 
     "park_button": 3,
     "neutral_button": 2,
@@ -21,10 +21,14 @@
     "speed_max": 15.0,
     "acceleration_limit": 2.0,
     "deceleration_limit": 2.5,
+    "brake_axes": 2,
+    "brake_sign": 1,
+    "max_deceleration_limit": 4.0,
 
     "steering_axes": 3,
     "steering_sign": 1.0,
     "steering_gain": 0.11,
     "steering_exponent": 2.5,
     "max_curvature_rate": 0.2
+
 }
