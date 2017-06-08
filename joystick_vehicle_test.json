@@ -25,10 +25,13 @@
     "brake_sign": 1,
     "max_deceleration_limit": 4.0,
 
+    "steer_btn_axes": 6,
+    "steer_btn_sign": 1,
+    "steer_btn_step": 0.01,
     "steering_axes": 3,
     "steering_sign": 1.0,
     "steering_gain": 0.11,
     "steering_exponent": 2.5,
-    "max_curvature_rate": 0.2
+    "max_curvature_rate": 0.03
 
 }

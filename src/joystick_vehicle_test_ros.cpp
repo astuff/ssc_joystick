@@ -60,6 +60,9 @@ int brake_axes = -1;
 float brake_sign = 0.0;
 float max_deceleration_limit = 0.0;
 
+int steer_btn_axes = -1;
+int steer_btn_sign = 0;
+float steer_btn_step = 0;
 int steering_axes = -1;
 float steering_sign = 0.0;
 float steering_gain = 0.0;
@@ -75,6 +78,8 @@ double last_joystick_msg = 0.0;
 int speed_last = 0;
 float desired_speed = 0.0;
 float desired_curvature = 0.0;
+bool steering_active_last_loop = false;
+int steer_last = 0;
 bool brake_inited = false; // Brake axes default is 0 (50%) until it's pressed
 bool brake_active = false;
 float deceleration = 0.0;
@@ -267,10 +272,54 @@ void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
         raw_sign = -1.0f;
       }
       desired_curvature = pow(raw, steering_exponent) * steering_gain * raw_sign;
+      steering_active_last_loop = true;
+    }
+    else if (steering_active_last_loop)
+    {
+      desired_curvature = 0.0;
+      steering_active_last_loop = false;
     }
     else
     {
-      desired_curvature = 0.0;
+      float steer = msg->axes.at((unsigned int) steer_btn_axes);
+      bool steer_updated = false;
+      if (steer > 0.1)
+      {
+        if (steer_last != 1)
+        {
+          desired_curvature += steer_btn_sign * steer_btn_step;
+          steer_updated = true;
+        }
+        steer_last = 1;
+      }
+      else if (speed < -0.1)
+      {
+        if (steer_last != -1)
+        {
+          desired_curvature -= steer_btn_sign * steer_btn_step;
+          steer_updated = true;
+        }
+        steer_last = -1;
+      }
+      else
+      {
+        steer_last = 0;
+      }
+
+      if (steer_updated)
+      {
+        if (desired_curvature > steering_gain)
+        {
+          desired_curvature = steering_gain;
+        }
+        else if (desired_curvature < -steering_gain)
+        {
+          desired_curvature = -steering_gain;
+        }
+
+        cout << "Desired Steering Curvature: " << desired_curvature << endl;
+      }
+
     }
   }
   else
@@ -449,6 +498,9 @@ int main(int argc, char **argv)
       brake_sign = json_obj["brake_sign"];
       max_deceleration_limit = json_obj["max_deceleration_limit"];
 
+      steer_btn_axes = json_obj["steer_btn_axes"];
+      steer_btn_sign = json_obj["steer_btn_sign"];
+      steer_btn_step = json_obj["steer_btn_step"];
       steering_axes = json_obj["steering_axes"];
       steering_sign = json_obj["steering_sign"];
       steering_gain = json_obj["steering_gain"];
@@ -486,6 +538,9 @@ int main(int argc, char **argv)
         brake_sign == 0 ||
         max_deceleration_limit == 0 ||
 
+        steer_btn_axes < 0 ||
+        steer_btn_sign == 0 ||
+        steer_btn_step == 0 ||
         steering_axes < 0 ||
         steering_sign == 0 ||
         steering_gain == 0 ||
