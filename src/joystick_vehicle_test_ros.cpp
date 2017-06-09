@@ -249,6 +249,8 @@ void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
 
     if (speed_updated)
     {
+      desired_speed = speed_step * round(desired_speed / speed_step);
+
       if (desired_speed > speed_max)
       {
         desired_speed = speed_max;
@@ -292,7 +294,7 @@ void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
         }
         steer_last = 1;
       }
-      else if (speed < -0.1)
+      else if (steer < -0.1)
       {
         if (steer_last != -1)
         {
@@ -308,6 +310,8 @@ void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
 
       if (steer_updated)
       {
+        desired_curvature = steer_btn_step * round(desired_curvature / steer_btn_step);
+
         if (desired_curvature > steering_gain)
         {
           desired_curvature = steering_gain;

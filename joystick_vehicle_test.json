@@ -30,8 +30,8 @@
     "steer_btn_step": 0.01,
     "steering_axes": 3,
     "steering_sign": 1.0,
-    "steering_gain": 0.11,
+    "steering_gain": 0.12,
     "steering_exponent": 2.5,
-    "max_curvature_rate": 0.03
+    "max_curvature_rate": 0.1
 
 }
