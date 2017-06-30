@@ -18,10 +18,13 @@ apply the brakes with the joystick, but the brake pedal can always be applied by
 control mode.
 
 The steering gain and exponent convert the steering joystick to a desired curvature which is passed down to the
-steering model.  The gain defines the maximum curvature, so the default of 0.11 1/meters allows for a minimum turning
-radius of about 9 meters.  The exponent controls the shape of the reponse: a number closer to 2 or above will mean
+steering model.  The gain defines the maximum curvature, so the default of 0.12 1/meters allows for a minimum turning
+radius of about 8 meters.  The exponent controls the shape of the reponse: a number closer to 2 or above will mean
 small joystick movements will translate to very small desired curvatures and therefore steering wheel angles,
 a number closer to 1 will mean the curvature varies more linearly across the full joystick range. 
+
+The curvature command can also be changed by pressing the left and right steering buttons.  The updated curvature
+will be output to the screen.  The steering joystick will override the value set with the buttons.
 
 The left and right turn signals can also be controlled with the buttons.  The turn signals will stay on as long
 as the button is pressed.
@@ -59,7 +62,10 @@ It is also intended that this application be used as an example of how to interf
     - acceleration_limit: The acceleration limit passed to the speed module, in m/sec
     - deceleration_limit: The deceleration limit passed to the speed module, in m/sec
 
-    - steering_axes: The joystick axes use to provide speed up and slow down commands
+    - steer_btn_axes: The joystick axes used to step the curvature to the left or right
+    - steer_btn_sign: Determines which button steps positive (to the left) and negative (to the right)
+    - steer_btn_step: How much to increment or decrement the curvature with each button press
+    - steering_axes: The joystick axes use to control the desired curvature
     - steering_sign: The sign of the joystick to control left and right
     - steering_gain: The gain of the steering, since the joystick is generally -1.0 to 1.0, this is essentially the
           maximum curvature, in 1/meter
