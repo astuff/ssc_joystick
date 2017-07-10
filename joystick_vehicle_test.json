@@ -11,6 +11,7 @@
     "park_button": 3,
     "neutral_button": 2,
     "drive_button": 0,
+    "reverse_button": 1,
 
     "right_turn_button": 5,
     "left_turn_button": 4,

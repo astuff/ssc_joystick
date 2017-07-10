@@ -46,6 +46,7 @@ int engage2_button = -1;
 int park_button = -1;
 int neutral_button = -1;
 int drive_button = -1;
+int reverse_button = -1;
 
 int right_turn_button = -1;
 int left_turn_button = -1;
@@ -175,6 +176,10 @@ void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
     else if (msg->buttons.at((unsigned int) drive_button) > 0)
     {
       gear_command_msg.command.gear = automation_msgs::Gear::DRIVE;
+    }
+    else if (msg->buttons.at((unsigned int) reverse_button) > 0)
+    {
+      gear_command_msg.command.gear = automation_msgs::Gear::REVERSE;
     }
     gear_command_pub.publish(gear_command_msg);
 
@@ -488,6 +493,7 @@ int main(int argc, char **argv)
       park_button = json_obj["park_button"];
       neutral_button = json_obj["neutral_button"];
       drive_button = json_obj["drive_button"];
+      reverse_button = json_obj["reverse_button"];
 
       right_turn_button = json_obj["right_turn_button"];
       left_turn_button = json_obj["left_turn_button"];
@@ -528,6 +534,7 @@ int main(int argc, char **argv)
         park_button < 0 ||
         neutral_button < 0 ||
         drive_button < 0 ||
+        reverse_button < 0 ||
 
         right_turn_button < 0 ||
         left_turn_button < 0 ||
