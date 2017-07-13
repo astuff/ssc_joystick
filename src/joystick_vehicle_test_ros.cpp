@@ -98,7 +98,8 @@ void disengage()
 {
   cout << "DISENGAGED" << endl;
   engaged = 0;
-  if ((current_gear == automation_msgs::Gear::DRIVE) && (current_velocity < 0.01))
+  if ((current_gear == automation_msgs::Gear::DRIVE) || 
+      (current_gear == automation_msgs::Gear::REVERSE))
   {
     gear_command_msg.command.gear = automation_msgs::Gear::PARK;
     gear_command_pub.publish(gear_command_msg);
@@ -119,6 +120,8 @@ void tryToEngage()
   else
   {
     cout << "ENGAGED" << endl;
+    desired_speed = 0.0;
+    desired_curvature = 0.0;
     engaged = 1;
   }
 }
@@ -377,17 +380,7 @@ void misc1Callback(const dbw_mkz_msgs::Misc1Report::ConstPtr& msg)
   }
   else if (msg->btn_cc_set_dec && msg->btn_cc_gap_dec)
   {
-    if (!dbw_ok)
-    {
-      cout << "System not ready to engage" << endl;
-    }
-    else if (engaged == 0)
-    {
-      cout << "ENGAGED" << endl;
-      engaged = 1;
-      desired_speed = 0.0;
-      desired_curvature = 0.0;
-    }
+    tryToEngage();
   }
 }
 
