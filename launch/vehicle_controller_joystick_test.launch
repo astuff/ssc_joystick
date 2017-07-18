@@ -35,7 +35,7 @@
             args="-f $(find joystick_vehicle_test)/joystick_vehicle_test.json" output="screen"/>
 
         <node pkg="speed_model" type="speed_model" name="speed_model"
-            args="-f $(find speed_model)/core_speed_model/speed_model.json" />
+            args="-f $(find speed_model)/core_speed_model/speed_model.json" output="screen"/>
 
         <node pkg="steering_model" type="steering_model" name="steering_model"
             args="-f $(find steering_model)/core_steering_model/steering_model.json" />

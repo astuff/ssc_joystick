@@ -401,6 +401,8 @@ void moduleStateCallback(const automation_msgs::ModuleState::ConstPtr& msg)
       if (dbw_ok && (engaged > 0))
       {
         cout << "Joystick control DISENGAGED due to " << msg->info << endl;
+        gear_command_msg.command.gear = automation_msgs::Gear::NEUTRAL;
+        gear_command_pub.publish(gear_command_msg);
         engaged = 0;
       }
       dbw_ok = false;
