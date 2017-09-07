@@ -41,10 +41,10 @@
             args="-f $(find steering_model)/core_steering_model/steering_model.json" />
 
         <node pkg="ds_veh_controller" type="ds_veh_controller" name="veh_controller"
-            args="-f $(find ds_veh_controller)/core_ds_veh_controller/ds_veh_controller.json" />
+            args="-f $(find ds_veh_controller)/core_veh_controller/ds_veh_controller.json" />
 
         <node pkg="ds_veh_controller" type="ds_veh_interface" name="veh_interface"
-            args="-f $(find ds_veh_controller)/core_ds_veh_controller/ds_veh_interface.json" />
+            args="-f $(find ds_veh_controller)/core_veh_controller/ds_veh_interface.json" />
     </group>
 
 </launch>
