@@ -4,7 +4,7 @@
   <version>1.1.0</version>
   <description>Sends commands to test the low level vehicle modules</description>
 
-  <maintainer email="dstanek@autonomoustuff.com">Daniel Stanek</maintainer>
+  <maintainer email="software@autonomoustuff.com">AutonomouStuff Software Team</maintainer>
   <license>Closed Source</license>
   <author email="dstanek@autonomoustuff.com">Daniel Stanek</author>
 
@@ -12,14 +12,14 @@
 
   <build_depend>roscpp</build_depend>
   <build_depend>std_msgs</build_depend>
-  <build_depend>automation_msgs</build_depend>
-  <build_depend>highway_msgs</build_depend>
+  <build_depend>platform_comm_msgs</build_depend>
+  <build_depend>module_comm_msgs</build_depend>
   <build_depend>dbw_mkz_msgs</build_depend>
 
   <run_depend>roscpp</run_depend>
   <run_depend>std_msgs</run_depend>
-  <run_depend>automation_msgs</run_depend>
-  <run_depend>highway_msgs</run_depend>
+  <run_depend>platform_comm_msgs</run_depend>
+  <run_depend>module_comm_msgs</run_depend>
   <run_depend>dbw_mkz_msgs</run_depend>
 
 </package>
