@@ -23,12 +23,11 @@
 #include <platform_comm_msgs/GearCommand.h>
 #include <platform_comm_msgs/GearFeedback.h>
 #include <platform_comm_msgs/TurnSignalCommand.h>
+#include <platform_comm_msgs/UserInputADAS.h>
 #include <module_comm_msgs/ModuleState.h>
 #include <module_comm_msgs/SpeedMode.h>
 #include <module_comm_msgs/SteerMode.h>
 #include <module_comm_msgs/VelocityAccel.h>
-
-#include <dbw_mkz_msgs/Misc1Report.h>
 
 #include <Json.hpp>
 #include <GeneralUtils.hpp>
@@ -367,16 +366,16 @@ void velocityCallback(const module_comm_msgs::VelocityAccel::ConstPtr& msg)
   current_velocity = msg->velocity;
 }
 
-void misc1Callback(const dbw_mkz_msgs::Misc1Report::ConstPtr& msg)
+void inputAdasCallback(const platform_comm_msgs::UserInputADAS::ConstPtr& msg)
 {
-  if (msg->btn_cc_set_inc && msg->btn_cc_gap_inc)
+  if (msg->btn_cc_set_inc && msg->btn_acc_gap_inc)
   {
     if (engaged > 0)
     {
       disengage();
     }
   }
-  else if (msg->btn_cc_set_dec && msg->btn_cc_gap_dec)
+  else if (msg->btn_cc_set_dec && msg->btn_acc_gap_dec)
   {
     tryToEngage();
   }
@@ -580,7 +579,7 @@ int main(int argc, char **argv)
   ros::Subscriber joy_fault_sub = n.subscribe("diagnostics", 1, diagnosticCallback);
   ros::Subscriber gear_sub = n.subscribe("gear_feedback", 1, gearFeedbackCallback);
   ros::Subscriber velocity_sub = n.subscribe("velocity_accel", 1, velocityCallback);
-  ros::Subscriber misc1_sub = n.subscribe("misc_1_report", 1, misc1Callback);
+  ros::Subscriber adas_input_sub = n.subscribe("adas_input", 1, inputAdasCallback);
 
   // Wait for time to be valid
   while (ros::Time::now().nsec == 0);
