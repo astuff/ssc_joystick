@@ -9,7 +9,6 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   platform_comm_msgs
   module_comm_msgs
-  dbw_mkz_msgs
 )
 
 ## Declare a catkin package
@@ -17,7 +16,6 @@ catkin_package(CATKIN_DEPENDS
   std_msgs
   platform_comm_msgs
   module_comm_msgs
-  dbw_mkz_msgs
 )
 
 ## Build executables

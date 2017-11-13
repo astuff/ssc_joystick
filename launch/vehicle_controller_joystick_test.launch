@@ -18,7 +18,7 @@
     <remap from="/as/gear_cmd" to="/vehicle/gear_cmd" />
     <remap from="/as/gear_report" to="/vehicle/gear_report" />
     <remap from="/as/wheel_speed_report" to="/vehicle/wheel_speed_report" />
-    <remap from="/as/misc_1_report" to="/vehicle/misc_1_report" />
+    <remap from="/as/adas_input" to="/vehicle/adas_input" />
 
     <include file="$(find pacmod)/launch/pacmod.launch">
       <arg name="use_kvaser" value="true"/>
