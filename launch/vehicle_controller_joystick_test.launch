@@ -20,9 +20,11 @@
     <remap from="/as/wheel_speed_report" to="/vehicle/wheel_speed_report" />
     <remap from="/as/misc_1_report" to="/vehicle/misc_1_report" />
 
-    <include file="$(find dbw_mkz_can)/launch/dbw.launch">
-        <arg name="twist_use_pedals" value="False"/>
-        <arg name="twist_use_steering" value="False"/>
+    <include file="$(find pacmod)/launch/pacmod.launch">
+      <arg name="use_kvaser" value="true"/>
+      <arg name="kvaser_hardware_id" value="27780" />
+      <arg name="kvaser_circuit_id" value="0" />
+      <arg name="pacmod_vehicle_type" value="LEXUS_RX_450H" />
     </include>
 
     <group ns="as">
