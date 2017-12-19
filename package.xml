@@ -14,4 +14,5 @@
   <depend>std_msgs</depend>
   <depend>platform_comm_msgs</depend>
   <depend>module_comm_msgs</depend>
+  <depend>joy</depend>
 </package>
