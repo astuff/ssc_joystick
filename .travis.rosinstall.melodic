@@ -1,4 +1,8 @@
 - git:
+    local-name: astuff_sensor_msgs
+    uri: https://github.com/astuff/astuff_sensor_msgs
+
+- git:
     local-name: platform_automation_msgs
     uri: https://github.com/astuff/platform_automation_msgs
 
