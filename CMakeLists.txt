@@ -24,7 +24,7 @@ include_directories(include
 )
 
 add_executable(joystick_vehicle_test
-  ${CMAKE_SOURCE_DIR}/src/joystick_vehicle_test_ros.cpp
+  src/joystick_vehicle_test_ros.cpp
 )
 
 target_link_libraries(joystick_vehicle_test ${catkin_LIBRARIES} ASCommon)
