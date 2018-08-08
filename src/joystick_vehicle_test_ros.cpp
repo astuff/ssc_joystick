@@ -10,14 +10,14 @@
 #include <sensor_msgs/Joy.h>
 #include <diagnostic_msgs/DiagnosticArray.h>
 
-#include <platform_comm_msgs/GearCommand.h>
-#include <platform_comm_msgs/GearFeedback.h>
-#include <platform_comm_msgs/TurnSignalCommand.h>
-#include <platform_comm_msgs/UserInputADAS.h>
-#include <module_comm_msgs/ModuleState.h>
-#include <module_comm_msgs/SpeedMode.h>
-#include <module_comm_msgs/SteerMode.h>
-#include <module_comm_msgs/VelocityAccel.h>
+#include <automotive_platform_msgs/GearCommand.h>
+#include <automotive_platform_msgs/GearFeedback.h>
+#include <automotive_platform_msgs/TurnSignalCommand.h>
+#include <automotive_platform_msgs/UserInputADAS.h>
+#include <automotive_platform_msgs/SpeedMode.h>
+#include <automotive_platform_msgs/SteerMode.h>
+#include <automotive_platform_msgs/VelocityAccel.h>
+#include <automotive_navigation_msgs/ModuleState.h>
 
 #include <Json.hpp>
 #include <GeneralUtils.hpp>
@@ -72,23 +72,23 @@ bool brake_inited = false; // Brake axes default is 0 (50%) until it's pressed
 bool brake_active = false;
 float deceleration = 0.0;
 
-uint8_t current_gear = platform_comm_msgs::Gear::NONE;
+uint8_t current_gear = automotive_platform_msgs::Gear::NONE;
 float current_velocity = 1.0;
 
-platform_comm_msgs::GearCommand gear_command_msg;
+automotive_platform_msgs::GearCommand gear_command_msg;
 ros::Publisher gear_command_pub;
 
-platform_comm_msgs::TurnSignalCommand turn_signal_command_msg;
+automotive_platform_msgs::TurnSignalCommand turn_signal_command_msg;
 ros::Publisher turn_signal_command_pub;
 
 void disengage()
 {
   cout << "DISENGAGED" << endl;
   engaged = 0;
-  if ((current_gear == platform_comm_msgs::Gear::DRIVE) || 
-      (current_gear == platform_comm_msgs::Gear::REVERSE))
+  if ((current_gear == automotive_platform_msgs::Gear::DRIVE) || 
+      (current_gear == automotive_platform_msgs::Gear::REVERSE))
   {
-    gear_command_msg.command.gear = platform_comm_msgs::Gear::PARK;
+    gear_command_msg.command.gear = automotive_platform_msgs::Gear::PARK;
     gear_command_pub.publish(gear_command_msg);
   }
 }
@@ -99,8 +99,8 @@ void tryToEngage()
   {
     cout << "Drive by wire system not ready to engage" << endl;
   }
-  else if ((current_gear != platform_comm_msgs::Gear::PARK) &&
-           (current_gear != platform_comm_msgs::Gear::NEUTRAL))
+  else if ((current_gear != automotive_platform_msgs::Gear::PARK) &&
+           (current_gear != automotive_platform_msgs::Gear::NEUTRAL))
   {
     cout << "Gear must be in park or neutral to engage" << endl;
   }
@@ -156,36 +156,36 @@ void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
       }
       else
       {
-        gear_command_msg.command.gear = platform_comm_msgs::Gear::PARK;
+        gear_command_msg.command.gear = automotive_platform_msgs::Gear::PARK;
       }
     }
     else if (msg->buttons.at((unsigned int) neutral_button) > 0)
     {
-      gear_command_msg.command.gear = platform_comm_msgs::Gear::NEUTRAL;
+      gear_command_msg.command.gear = automotive_platform_msgs::Gear::NEUTRAL;
     }
     else if (msg->buttons.at((unsigned int) drive_button) > 0)
     {
-      gear_command_msg.command.gear = platform_comm_msgs::Gear::DRIVE;
+      gear_command_msg.command.gear = automotive_platform_msgs::Gear::DRIVE;
     }
     else if (msg->buttons.at((unsigned int) reverse_button) > 0)
     {
-      gear_command_msg.command.gear = platform_comm_msgs::Gear::REVERSE;
+      gear_command_msg.command.gear = automotive_platform_msgs::Gear::REVERSE;
     }
     gear_command_pub.publish(gear_command_msg);
 
     if (msg->buttons.at((unsigned int) right_turn_button) > 0)
     {
-      turn_signal_command_msg.turn_signal = platform_comm_msgs::TurnSignalCommand::RIGHT;
+      turn_signal_command_msg.turn_signal = automotive_platform_msgs::TurnSignalCommand::RIGHT;
       turn_signal_command_msg.mode = 1;
     }
     else if (msg->buttons.at((unsigned int) left_turn_button) > 0)
     {
-      turn_signal_command_msg.turn_signal = platform_comm_msgs::TurnSignalCommand::LEFT;
+      turn_signal_command_msg.turn_signal = automotive_platform_msgs::TurnSignalCommand::LEFT;
       turn_signal_command_msg.mode = 1;
     }
     else
     {
-      turn_signal_command_msg.turn_signal = platform_comm_msgs::TurnSignalCommand::NONE;
+      turn_signal_command_msg.turn_signal = automotive_platform_msgs::TurnSignalCommand::NONE;
       turn_signal_command_msg.mode = 0;
     }
 
@@ -346,17 +346,17 @@ void diagnosticCallback(const diagnostic_msgs::DiagnosticArray::ConstPtr& msg)
   }
 }
 
-void gearFeedbackCallback(const platform_comm_msgs::GearFeedback::ConstPtr& msg)
+void gearFeedbackCallback(const automotive_platform_msgs::GearFeedback::ConstPtr& msg)
 {
   current_gear = msg->current_gear.gear;
 }
 
-void velocityCallback(const module_comm_msgs::VelocityAccel::ConstPtr& msg)
+void velocityCallback(const automotive_platform_msgs::VelocityAccel::ConstPtr& msg)
 {
   current_velocity = msg->velocity;
 }
 
-void inputAdasCallback(const platform_comm_msgs::UserInputADAS::ConstPtr& msg)
+void inputAdasCallback(const automotive_platform_msgs::UserInputADAS::ConstPtr& msg)
 {
   if (msg->btn_cc_set_inc && msg->btn_acc_gap_inc)
   {
@@ -371,7 +371,7 @@ void inputAdasCallback(const platform_comm_msgs::UserInputADAS::ConstPtr& msg)
   }
 }
 
-void moduleStateCallback(const module_comm_msgs::ModuleState::ConstPtr& msg)
+void moduleStateCallback(const automotive_navigation_msgs::ModuleState::ConstPtr& msg)
 {
   if (msg->name == vel_controller_name)
   {
@@ -388,7 +388,7 @@ void moduleStateCallback(const module_comm_msgs::ModuleState::ConstPtr& msg)
       if (dbw_ok && (engaged > 0))
       {
         cout << "Joystick control DISENGAGED due to " << msg->info << endl;
-        gear_command_msg.command.gear = platform_comm_msgs::Gear::NEUTRAL;
+        gear_command_msg.command.gear = automotive_platform_msgs::Gear::NEUTRAL;
         gear_command_pub.publish(gear_command_msg);
         engaged = 0;
       }
@@ -558,10 +558,10 @@ int main(int argc, char **argv)
   ros::Rate loop_rate(1.0 / publish_interval);
 
   // Advertise messages to send
-  gear_command_pub = n.advertise<platform_comm_msgs::GearCommand>("gear_select", 1);
-  turn_signal_command_pub = n.advertise<platform_comm_msgs::TurnSignalCommand>("turn_signal_command", 1);
-  ros::Publisher speed_pub = n.advertise<module_comm_msgs::SpeedMode>("arbitrated_speed_commands", 1);
-  ros::Publisher steer_pub = n.advertise<module_comm_msgs::SteerMode>("arbitrated_steering_commands", 1);
+  gear_command_pub = n.advertise<automotive_platform_msgs::GearCommand>("gear_select", 1);
+  turn_signal_command_pub = n.advertise<automotive_platform_msgs::TurnSignalCommand>("turn_signal_command", 1);
+  ros::Publisher speed_pub = n.advertise<automotive_platform_msgs::SpeedMode>("arbitrated_speed_commands", 1);
+  ros::Publisher steer_pub = n.advertise<automotive_platform_msgs::SteerMode>("arbitrated_steering_commands", 1);
 
   // Subscribe to messages to read
   ros::Subscriber state_sub = n.subscribe("module_states", 5, moduleStateCallback);
@@ -574,8 +574,8 @@ int main(int argc, char **argv)
   // Wait for time to be valid
   while (ros::Time::now().nsec == 0);
 
-  module_comm_msgs::SpeedMode speed_msg;
-  module_comm_msgs::SteerMode steer_msg;
+  automotive_platform_msgs::SpeedMode speed_msg;
+  automotive_platform_msgs::SteerMode steer_msg;
 
   // Loop as long as module should run
   while (ros::ok())

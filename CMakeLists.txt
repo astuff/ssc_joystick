@@ -7,15 +7,15 @@ add_definitions(-std=c++11 -Wall -Wextra)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
-  platform_comm_msgs
-  module_comm_msgs
+  automotive_platform_msgs
+  automotive_navigation_msgs
 )
 
 ## Declare a catkin package
 catkin_package(CATKIN_DEPENDS
   std_msgs
-  platform_comm_msgs
-  module_comm_msgs
+  automotive_platform_msgs
+  automotive_navigation_msgs
 )
 
 ## Build executables
