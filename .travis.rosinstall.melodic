@@ -1,7 +1,0 @@
-- git:
-    local-name: automotive_autonomy_msgs
-    uri: https://github.com/astuff/automotive_autonomy_msgs
-
-- git:
-    local-name: joystick_drivers
-    uri: https://github.com/ros-drivers/joystick_drivers
