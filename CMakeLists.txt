@@ -7,15 +7,15 @@ add_definitions(-std=c++11 -Wall -Wextra)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
-  platform_comm_msgs
-  module_comm_msgs
+  automotive_platform_msgs
+  automotive_navigation_msgs
 )
 
 ## Declare a catkin package
 catkin_package(CATKIN_DEPENDS
   std_msgs
-  platform_comm_msgs
-  module_comm_msgs
+  automotive_platform_msgs
+  automotive_navigation_msgs
 )
 
 ## Build executables
@@ -24,7 +24,7 @@ include_directories(include
 )
 
 add_executable(joystick_vehicle_test
-  ${CMAKE_SOURCE_DIR}/src/joystick_vehicle_test_ros.cpp
+  src/joystick_vehicle_test_ros.cpp
 )
 
 target_link_libraries(joystick_vehicle_test ${catkin_LIBRARIES} ASCommon)
