@@ -8,7 +8,7 @@ jobs:
       - run:
           name: Set Up Container
           command: |
-            apt-get install software-properties-common -y
+            apt-get update -qq && apt-get install software-properties-common -y
             add-apt-repository ppa:ubuntu-toolchain-r/test -y
             apt-get update && apt-get install openssh-client python-catkin-tools build-essential curl gcc-5 g++-5 -y
             update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 1 --slave /usr/bin/g++ g++ /usr/bin/g++-5
