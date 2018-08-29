@@ -1,6 +1,6 @@
 # ROS Joystick Vehicle Test Application #
 
-[![Build Status](https://travis-ci.org/astuff/joystick_vehicle_test.svg?branch=master)](https://travis-ci.org/astuff/joystick_vehicle_test)
+[![CircleCI](https://circleci.com/gh/astuff/joystick_vehicle_test/tree/master.svg?style=svg)](https://circleci.com/gh/astuff/joystick_vehicle_test/tree/master)
 
 An application for converting user's joystick commands into gear, steering, speed, and turn signal commands
 to pass to the AutonomouStuff vehicle control software.  Use the launch file provided to start this module,
