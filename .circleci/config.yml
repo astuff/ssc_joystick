@@ -8,12 +8,12 @@ jobs:
       - run:
           name: Set Up Container
           command: |
-            curl https://s3.us-east-2.amazonaws.com/astuff-common-lib/ubuntu_1404/libas-common_2.1.0-0~14.040_amd64.deb -o /tmp/libas-common.deb
-            dpkg -i /tmp/libas-common.deb
             apt-get install software-properties-common -y
             add-apt-repository ppa:ubuntu-toolchain-r/test -y
-            apt-get update && apt-get install openssh-client python-catkin-tools build-essential gcc-5 g++-5 -y
+            apt-get update && apt-get install openssh-client python-catkin-tools build-essential curl gcc-5 g++-5 -y
             update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 1 --slave /usr/bin/g++ g++ /usr/bin/g++-5
+            curl https://s3.us-east-2.amazonaws.com/astuff-common-lib/ubuntu_1404/libas-common_2.1.0-0~14.040_amd64.deb -o /tmp/libas-common.deb
+            dpkg -i /tmp/libas-common.deb
             source `find /opt/ros -name setup.bash | sort | head -1`
             rosdep install --from-paths . --ignore-src -y
             cd ..
@@ -39,9 +39,9 @@ jobs:
       - run:
           name: Set Up Container
           command: |
+            apt-get update && apt-get install openssh-client python-catkin-tools build-essential curl -y
             curl https://s3.us-east-2.amazonaws.com/astuff-common-lib/ubuntu_1604/libas-common_2.1.0-0~16.040_amd64.deb -o /tmp/libas-common.deb
             dpkg -i /tmp/libas-common.deb
-            apt-get update && apt-get install openssh-client python-catkin-tools build-essential -y
             source `find /opt/ros -name setup.bash | sort | head -1`
             rosdep install --from-paths . --ignore-src -y
             cd ..
@@ -67,9 +67,9 @@ jobs:
       - run:
           name: Set Up Container
           command: |
+            apt-get update && apt-get install openssh-client python-catkin-tools build-essential curl -y
             curl https://s3.us-east-2.amazonaws.com/astuff-common-lib/ubuntu_1604/libas-common_2.1.0-0~16.040_amd64.deb -o /tmp/libas-common.deb
             dpkg -i /tmp/libas-common.deb
-            apt-get update && apt-get install openssh-client python-catkin-tools build-essential -y
             source `find /opt/ros -name setup.bash | sort | head -1`
             rosdep install --from-paths . --ignore-src -y
             cd ..
@@ -95,9 +95,9 @@ jobs:
       - run:
           name: Set Up Container
           command: |
+            apt-get update && apt-get install openssh-client python-catkin-tools build-essential curl -y
             curl https://s3.us-east-2.amazonaws.com/astuff-common-lib/ubuntu_1604/libas-common_2.1.0-0~16.040_amd64.deb -o /tmp/libas-common.deb
             dpkg -i /tmp/libas-common.deb
-            apt-get update && apt-get install openssh-client python-catkin-tools build-essential -y
             source `find /opt/ros -name setup.bash | sort | head -1`
             rosdep install --from-paths . --ignore-src -y
             cd ..
