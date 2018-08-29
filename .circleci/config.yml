@@ -1,0 +1,125 @@
+version: 2
+jobs:
+  indigo:
+    docker:
+      - image: ros:indigo-ros-core
+    steps:
+      - checkout
+      - run:
+          name: Set Up Container
+          command: |
+            apt-get update -qq && apt-get install software-properties-common -y
+            add-apt-repository ppa:ubuntu-toolchain-r/test -y
+            apt-get update && apt-get install openssh-client python-catkin-tools build-essential curl gcc-5 g++-5 -y
+            update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 1 --slave /usr/bin/g++ g++ /usr/bin/g++-5
+            curl https://s3.us-east-2.amazonaws.com/astuff-common-lib/ubuntu_1404/libas-common_2.1.0-0~14.040_amd64.deb -o /tmp/libas-common.deb
+            dpkg -i /tmp/libas-common.deb
+            source `find /opt/ros -name setup.bash | sort | head -1`
+            rosdep install --from-paths . --ignore-src -y
+            cd ..
+            catkin init
+            catkin config --extend /opt/ros/$ROS_DISTRO
+      - run:
+          name: Build
+          command: |
+            cd ..
+            catkin build
+      - run:
+          name: Run Tests
+          command: |
+            cd ..
+            catkin run_tests
+    working_directory: ~/src
+
+  kinetic:
+    docker:
+      - image: ros:kinetic-ros-core
+    steps:
+      - checkout
+      - run:
+          name: Set Up Container
+          command: |
+            apt-get update && apt-get install openssh-client python-catkin-tools build-essential curl -y
+            curl https://s3.us-east-2.amazonaws.com/astuff-common-lib/ubuntu_1604/libas-common_2.1.0-0~16.040_amd64.deb -o /tmp/libas-common.deb
+            dpkg -i /tmp/libas-common.deb
+            source `find /opt/ros -name setup.bash | sort | head -1`
+            rosdep install --from-paths . --ignore-src -y
+            cd ..
+            catkin init
+            catkin config --extend /opt/ros/$ROS_DISTRO
+      - run:
+          name: Build
+          command: |
+            cd ..
+            catkin build
+      - run:
+          name: Run Tests
+          command: |
+            cd ..
+            catkin run_tests
+    working_directory: ~/src
+
+  lunar:
+    docker:
+      - image: ros:lunar-ros-core
+    steps:
+      - checkout
+      - run:
+          name: Set Up Container
+          command: |
+            apt-get update && apt-get install openssh-client python-catkin-tools build-essential curl -y
+            curl https://s3.us-east-2.amazonaws.com/astuff-common-lib/ubuntu_1604/libas-common_2.1.0-0~16.040_amd64.deb -o /tmp/libas-common.deb
+            dpkg -i /tmp/libas-common.deb
+            source `find /opt/ros -name setup.bash | sort | head -1`
+            rosdep install --from-paths . --ignore-src -y
+            cd ..
+            catkin init
+            catkin config --extend /opt/ros/$ROS_DISTRO
+      - run:
+          name: Build
+          command: |
+            cd ..
+            catkin build
+      - run:
+          name: Run Tests
+          command: |
+            cd ..
+            catkin run_tests
+    working_directory: ~/src
+
+  melodic:
+    docker:
+      - image: ros:melodic-ros-core
+    steps:
+      - checkout
+      - run:
+          name: Set Up Container
+          command: |
+            apt-get update && apt-get install openssh-client python-catkin-tools build-essential curl -y
+            curl https://s3.us-east-2.amazonaws.com/astuff-common-lib/ubuntu_1604/libas-common_2.1.0-0~16.040_amd64.deb -o /tmp/libas-common.deb
+            dpkg -i /tmp/libas-common.deb
+            source `find /opt/ros -name setup.bash | sort | head -1`
+            rosdep install --from-paths . --ignore-src -y
+            cd ..
+            catkin init
+            catkin config --extend /opt/ros/$ROS_DISTRO
+      - run:
+          name: Build
+          command: |
+            cd ..
+            catkin build
+      - run:
+          name: Run Tests
+          command: |
+            cd ..
+            catkin run_tests
+    working_directory: ~/src
+
+workflows:
+  version: 2
+  ros_build:
+    jobs:
+      - indigo
+      - kinetic
+      - lunar
+      - melodic
