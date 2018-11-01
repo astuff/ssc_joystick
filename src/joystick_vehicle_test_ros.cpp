@@ -566,7 +566,7 @@ int main(int argc, char **argv)
   // Subscribe to messages to read
   ros::Subscriber state_sub = n.subscribe("module_states", 5, moduleStateCallback);
   ros::Subscriber joy_sub = n.subscribe("joy", 5, joystickCallback);
-  ros::Subscriber joy_fault_sub = n.subscribe("diagnostics", 1, diagnosticCallback);
+  ros::Subscriber joy_fault_sub = n.subscribe("diagnostics", 10, diagnosticCallback);
   ros::Subscriber gear_sub = n.subscribe("gear_feedback", 1, gearFeedbackCallback);
   ros::Subscriber velocity_sub = n.subscribe("velocity_accel", 1, velocityCallback);
   ros::Subscriber adas_input_sub = n.subscribe("adas_input", 1, inputAdasCallback);
