@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   automotive_platform_msgs
   automotive_navigation_msgs
+  joy
 )
 
 ## Declare a catkin package
@@ -27,8 +28,8 @@ add_executable(joystick_vehicle_test
   src/joystick_vehicle_test_ros.cpp
 )
 
-target_link_libraries(joystick_vehicle_test ${catkin_LIBRARIES} ASCommon)
 add_dependencies(joystick_vehicle_test ${catkin_EXPORTED_TARGETS})
+target_link_libraries(joystick_vehicle_test ${catkin_LIBRARIES} ASCommon)
 
 install(TARGETS ${PROJECT_NAME}
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
