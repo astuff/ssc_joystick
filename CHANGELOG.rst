@@ -2,8 +2,8 @@
 Changelog for package joystick_vehicle_test
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.0 (2018-12-03)
+------------------
 * Merge pull request `#7 <https://github.com/astuff/joystick_vehicle_test/issues/7>`_ from astuff/feature/gazebo-sim
 * added dbw simulated CAN, removed the dataspeed joystick node
   Tested by launching the single launch file.
