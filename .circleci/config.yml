@@ -205,19 +205,19 @@ workflows:
   ros_build:
     jobs:
       - indigo:
-          filter:
+          filters:
             branches:
               ignore: release
       - kinetic:
-          filter:
+          filters:
             branches:
               ignore: release
       - lunar:
-          filter:
+          filters:
             branches:
               ignore: release
       - melodic:
-          filter:
+          filters:
             branches:
               ignore: release
   ros_release:
