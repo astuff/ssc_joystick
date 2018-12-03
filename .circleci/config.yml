@@ -2,18 +2,13 @@ version: 2
 jobs:
   indigo:
     docker:
-      - image: ros:indigo-ros-core
+      - image: autonomoustuff/docker-builds:indigo-ros-base
     steps:
       - checkout
       - run:
           name: Set Up Container
           command: |
-            apt-get update -qq && apt-get install software-properties-common -y
-            add-apt-repository ppa:ubuntu-toolchain-r/test -y
-            apt-get update && apt-get install openssh-client python-catkin-tools build-essential curl gcc-5 g++-5 -y
-            update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 1 --slave /usr/bin/g++ g++ /usr/bin/g++-5
-            curl https://s3.us-east-2.amazonaws.com/astuff-common-lib/ubuntu_1404/libas-common_2.1.0-0~14.040_amd64.deb -o /tmp/libas-common.deb
-            dpkg -i /tmp/libas-common.deb
+            apt-get update -qq
             source `find /opt/ros -name setup.bash | sort | head -1`
             rosdep install --from-paths . --ignore-src -y
             cd ..
@@ -33,15 +28,13 @@ jobs:
 
   kinetic:
     docker:
-      - image: ros:kinetic-ros-core
+      - image: autonomoustuff/docker-builds:kinetic-ros-base
     steps:
       - checkout
       - run:
           name: Set Up Container
           command: |
-            apt-get update && apt-get install openssh-client python-catkin-tools build-essential curl -y
-            curl https://s3.us-east-2.amazonaws.com/astuff-common-lib/ubuntu_1604/libas-common_2.1.0-0~16.040_amd64.deb -o /tmp/libas-common.deb
-            dpkg -i /tmp/libas-common.deb
+            apt-get update -qq
             source `find /opt/ros -name setup.bash | sort | head -1`
             rosdep install --from-paths . --ignore-src -y
             cd ..
@@ -61,15 +54,13 @@ jobs:
 
   lunar:
     docker:
-      - image: ros:lunar-ros-core
+      - image: autonomoustuff/docker-builds:lunar-ros-base
     steps:
       - checkout
       - run:
           name: Set Up Container
           command: |
-            apt-get update && apt-get install openssh-client python-catkin-tools build-essential curl -y
-            curl https://s3.us-east-2.amazonaws.com/astuff-common-lib/ubuntu_1604/libas-common_2.1.0-0~16.040_amd64.deb -o /tmp/libas-common.deb
-            dpkg -i /tmp/libas-common.deb
+            apt-get update -qq
             source `find /opt/ros -name setup.bash | sort | head -1`
             rosdep install --from-paths . --ignore-src -y
             cd ..
@@ -89,15 +80,13 @@ jobs:
 
   melodic:
     docker:
-      - image: ros:melodic-ros-core
+      - image: autonomoustuff/docker-builds:melodic-ros-base
     steps:
       - checkout
       - run:
           name: Set Up Container
           command: |
-            apt-get update && apt-get install openssh-client python-catkin-tools build-essential curl -y
-            curl https://s3.us-east-2.amazonaws.com/astuff-common-lib/ubuntu_1604/libas-common_2.1.0-0~16.040_amd64.deb -o /tmp/libas-common.deb
-            dpkg -i /tmp/libas-common.deb
+            apt-get update -qq
             source `find /opt/ros -name setup.bash | sort | head -1`
             rosdep install --from-paths . --ignore-src -y
             cd ..
@@ -115,11 +104,141 @@ jobs:
             catkin run_tests
     working_directory: ~/src
 
+  indigo_release:
+    docker:
+      - image: autonomoustuff/docker-builds:indigo-ros-base
+    steps:
+      - checkout
+      - run:
+          name: Set Up Container
+          command: |
+            apt-get update -qq && apt-get install -y dh-make python-bloom ruby
+            gem install --no-rdoc --no-ri deb-s3
+            source `find /opt/ros -name setup.bash | sort | head -1`
+            rosdep install --from-paths . --ignore-src -y
+      - run:
+          name: Build
+          command: |
+            bloom-generate rosdebian --os-name ubuntu --os-version trusty --ros-distro indigo
+            fakeroot debian/rules binary
+      - run:
+          name: Upload
+          command: |
+            cd ..
+            deb-s3 upload -b autonomoustuff-ssc -c trusty --preserve-versions $(ls *.deb) --access-key-id=$S3_ACCESS_KEY_ID --secret-access-key=$S3_SECRET_ACCESS_KEY
+    working_directory: ~/src
+
+  kinetic_release:
+    docker:
+      - image: autonomoustuff/docker-builds:kinetic-ros-base
+    steps:
+      - checkout
+      - run:
+          name: Set Up Container
+          command: |
+            apt-get update -qq && apt-get install -y dh-make python-bloom ruby
+            gem install --no-rdoc --no-ri deb-s3
+            source `find /opt/ros -name setup.bash | sort | head -1`
+            rosdep install --from-paths . --ignore-src -y
+      - run:
+          name: Build
+          command: |
+            bloom-generate rosdebian --os-name ubuntu --os-version xenial --ros-distro kinetic
+            fakeroot debian/rules binary
+      - run:
+          name: Upload
+          command: |
+            cd ..
+            deb-s3 upload -b autonomoustuff-ssc -c xenial --preserve-versions $(ls *.deb) --access-key-id=$S3_ACCESS_KEY_ID --secret-access-key=$S3_SECRET_ACCESS_KEY
+    working_directory: ~/src
+
+  lunar_release:
+    docker:
+      - image: autonomoustuff/docker-builds:lunar-ros-base
+    steps:
+      - checkout
+      - run:
+          name: Set Up Container
+          command: |
+            apt-get update -qq && apt-get install -y dh-make python-bloom ruby
+            gem install --no-rdoc --no-ri deb-s3
+            source `find /opt/ros -name setup.bash | sort | head -1`
+            rosdep install --from-paths . --ignore-src -y
+      - run:
+          name: Build
+          command: |
+            bloom-generate rosdebian --os-name ubuntu --os-version xenial --ros-distro lunar
+            fakeroot debian/rules binary
+      - run:
+          name: Upload
+          command: |
+            cd ..
+            deb-s3 upload -b autonomoustuff-ssc -c xenial --preserve-versions $(ls *.deb) --access-key-id=$S3_ACCESS_KEY_ID --secret-access-key=$S3_SECRET_ACCESS_KEY
+    working_directory: ~/src
+
+  melodic_release:
+    docker:
+      - image: autonomoustuff/docker-builds:melodic-ros-base
+    steps:
+      - checkout
+      - run:
+          name: Set Up Container
+          command: |
+            apt-get update -qq && apt-get install -y dh-make python-bloom ruby
+            gem install --no-rdoc --no-ri deb-s3
+            source `find /opt/ros -name setup.bash | sort | head -1`
+            rosdep install --from-paths . --ignore-src -y
+      - run:
+          name: Build
+          command: |
+            bloom-generate rosdebian --os-name ubuntu --os-version bionic --ros-distro melodic
+            fakeroot debian/rules binary
+      - run:
+          name: Upload
+          command: |
+            cd ..
+            deb-s3 upload -b autonomoustuff-ssc -c bionic --preserve-versions $(ls *.deb) --access-key-id=$S3_ACCESS_KEY_ID --secret-access-key=$S3_SECRET_ACCESS_KEY
+    working_directory: ~/src
+
 workflows:
   version: 2
   ros_build:
     jobs:
-      - indigo
-      - kinetic
-      - lunar
-      - melodic
+      - indigo:
+          filters:
+            branches:
+              ignore: release
+      - kinetic:
+          filters:
+            branches:
+              ignore: release
+      - lunar:
+          filters:
+            branches:
+              ignore: release
+      - melodic:
+          filters:
+            branches:
+              ignore: release
+  ros_release:
+    jobs:
+      - indigo_release:
+          context: ubuntu-pkg-build
+          filters:
+            branches:
+              only: release
+      - kinetic_release:
+          context: ubuntu-pkg-build
+          filters:
+            branches:
+              only: release
+      - lunar_release:
+          context: ubuntu-pkg-build
+          filters:
+            branches:
+              only: release
+      - melodic_release:
+          context: ubuntu-pkg-build
+          filters:
+            branches:
+              only: release
