@@ -34,5 +34,4 @@
     "steering_gain": 0.12,
     "steering_exponent": 2.5,
     "max_curvature_rate": 0.1
-
 }

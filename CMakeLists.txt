@@ -10,6 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
   automotive_platform_msgs
   automotive_navigation_msgs
   joy
+  roslint
 )
 
 ## Declare a catkin package
@@ -17,6 +18,7 @@ catkin_package(CATKIN_DEPENDS
   std_msgs
   automotive_platform_msgs
   automotive_navigation_msgs
+  roslint
 )
 
 ## Build executables
@@ -43,4 +45,9 @@ install(DIRECTORY launch/
 
 install(FILES "joystick_vehicle_test.json"
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
+
+set(ROSLINT_CPP_OPTS "--filter=-build/include_what_you_use,-build/namespaces,-build/c++11")
+roslint_cpp(
+  ${CMAKE_SOURCE_DIR}/src/joystick_vehicle_test_ros.cpp
 )
