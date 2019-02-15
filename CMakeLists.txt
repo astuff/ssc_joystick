@@ -5,6 +5,7 @@ add_definitions(-std=c++11 -Wall -Wextra)
 
 ## Find catkin and any catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  roslint
   roscpp
   std_msgs
   automotive_platform_msgs
@@ -30,6 +31,8 @@ add_executable(joystick_vehicle_test
 
 add_dependencies(joystick_vehicle_test ${catkin_EXPORTED_TARGETS})
 target_link_libraries(joystick_vehicle_test ${catkin_LIBRARIES} ASCommon)
+
+roslint_cpp()
 
 install(TARGETS ${PROJECT_NAME}
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

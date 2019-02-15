@@ -21,9 +21,9 @@
 
 #include <Json.hpp>
 #include <GeneralUtils.hpp>
+#include <string>
 
-using namespace std;
-using namespace AS;
+using namespace AS;  // NOLINT
 
 double joy_fault_timeout = 0.0;
 
@@ -57,7 +57,7 @@ float steering_gain = 0.0;
 float steering_exponent = 0.0;
 float max_curvature_rate = 0.0;
 
-string vel_controller_name = "";
+std::string vel_controller_name = "";
 
 bool dbw_ok = false;
 uint16_t engaged = 0;
@@ -68,7 +68,7 @@ float desired_speed = 0.0;
 float desired_curvature = 0.0;
 bool steering_active_last_loop = false;
 int steer_last = 0;
-bool brake_inited = false; // Brake axes default is 0 (50%) until it's pressed
+bool brake_inited = false;  // Brake axes default is 0 (50%) until it's pressed
 bool brake_active = false;
 float deceleration = 0.0;
 
@@ -83,9 +83,9 @@ ros::Publisher turn_signal_command_pub;
 
 void disengage()
 {
-  cout << "DISENGAGED" << endl;
+  std::cout << "DISENGAGED" << std::endl;
   engaged = 0;
-  if ((current_gear == automotive_platform_msgs::Gear::DRIVE) || 
+  if ((current_gear == automotive_platform_msgs::Gear::DRIVE) ||
       (current_gear == automotive_platform_msgs::Gear::REVERSE))
   {
     gear_command_msg.command.gear = automotive_platform_msgs::Gear::PARK;
@@ -97,16 +97,16 @@ void tryToEngage()
 {
   if (!dbw_ok)
   {
-    cout << "Drive by wire system not ready to engage" << endl;
+    std::cout << "Drive by wire system not ready to engage" << std::endl;
   }
   else if ((current_gear != automotive_platform_msgs::Gear::PARK) &&
            (current_gear != automotive_platform_msgs::Gear::NEUTRAL))
   {
-    cout << "Gear must be in park or neutral to engage" << endl;
+    std::cout << "Gear must be in park or neutral to engage" << std::endl;
   }
   else
   {
-    cout << "ENGAGED" << endl;
+    std::cout << "ENGAGED" << std::endl;
     desired_speed = 0.0;
     desired_curvature = 0.0;
     engaged = 1;
@@ -130,8 +130,8 @@ void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
         tryToEngage();
       }
       engage_pressed = true;
-    } 
- }
+    }
+  }
   else if ((msg->buttons.at((unsigned int) engage1_button) > 0) ||
            (msg->buttons.at((unsigned int) engage2_button) > 0))
   {
@@ -152,7 +152,7 @@ void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
     {
       if (current_velocity > 0.1)
       {
-        cout << "Must be stopped to change to park" << endl;
+        std::cout << "Must be stopped to change to park" << std::endl;
       }
       else
       {
@@ -227,7 +227,7 @@ void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
           desired_speed = 0.0;
           speed_updated = true;
         }
-        deceleration = (float) map2pt(brake, -0.95, 0.95, max_deceleration_limit, deceleration_limit);
+        deceleration = static_cast<float>(map2pt(brake, -0.95, 0.95, max_deceleration_limit, deceleration_limit));
       }
       else
       {
@@ -255,7 +255,7 @@ void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
         desired_speed = 0.0;
       }
 
-      cout << "Desired Speed: " << desired_speed << endl;
+      std::cout << "Desired Speed: " << desired_speed << std::endl;
     }
 
     float steering = msg->axes.at((unsigned int) steering_axes);
@@ -316,9 +316,8 @@ void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
           desired_curvature = -steering_gain;
         }
 
-        cout << "Desired Steering Curvature: " << desired_curvature << endl;
+        std::cout << "Desired Steering Curvature: " << desired_curvature << std::endl;
       }
-
     }
   }
   else
@@ -332,12 +331,12 @@ void diagnosticCallback(const diagnostic_msgs::DiagnosticArray::ConstPtr& msg)
 {
   for (auto it = msg->status.begin(); it < msg->status.end(); it++)
   {
-    if (it->name.find("Joystick Driver Status") != string::npos)
+    if (it->name.find("Joystick Driver Status") != std::string::npos)
     {
       last_joystick_msg = msg->header.stamp.toSec();
       if (it->level != diagnostic_msgs::DiagnosticStatus::OK)
       {
-        cout << "JOYSTICK FAULT" << endl;
+        std::cout << "JOYSTICK FAULT" << std::endl;
         engaged = 0;
         brake_inited = false;
         brake_active = false;
@@ -387,7 +386,7 @@ void moduleStateCallback(const automotive_navigation_msgs::ModuleState::ConstPtr
     {
       if (dbw_ok && (engaged > 0))
       {
-        cout << "Joystick control DISENGAGED due to " << msg->info << endl;
+        std::cout << "Joystick control DISENGAGED due to " << msg->info << std::endl;
         gear_command_msg.command.gear = automotive_platform_msgs::Gear::NEUTRAL;
         gear_command_pub.publish(gear_command_msg);
         engaged = 0;
@@ -398,8 +397,8 @@ void moduleStateCallback(const automotive_navigation_msgs::ModuleState::ConstPtr
     {
       if (dbw_ok)
       {
-        cout << "Joystick control unavailable due to " << msg->info << endl;
-        cout << "Software must be stopped and restarted once the problem is fixed" << endl;
+        std::cout << "Joystick control unavailable due to " << msg->info << std::endl;
+        std::cout << "Software must be stopped and restarted once the problem is fixed" << std::endl;
         engaged = 0;
       }
       dbw_ok = false;
@@ -413,25 +412,26 @@ int main(int argc, char **argv)
   int c;
   bool exit = false;
   bool config_file_provided = false;
-  string config_file;
+  std::string config_file;
 
   double publish_interval = 0.0;
 
-  optind = 0; //Resets the parsing index for getopt.
-  opterr = 1; //Re-enables showing an error for invalid parameters.
+  optind = 0;  // Resets the parsing index for getopt.
+  opterr = 1;  // Re-enables showing an error for invalid parameters.
 
   while ((c = getopt(argc, argv, "hf:")) != -1)
   {
     switch (c)
     {
       case 'h':
-        cout << endl;
-        cout << "Joystick testing for AutonomouStuff Vehicle Control Modules" << endl;
-        cout << "    -h             Show this help menu and exit." << endl;
-        cout
-          << "    -f <file.json> The JSON configuration file for all remaining parameters. See joystick_vehicle_test.json for an example."
-          << endl;
-        cout << endl;
+        std::cout << std::endl;
+        std::cout << "Joystick testing for AutonomouStuff Vehicle Control Modules" << std::endl;
+        std::cout << "    -h             Show this help menu and exit." << std::endl;
+        std::cout
+          << "    -f <file.json> The JSON configuration file for all remaining parameters."
+          << " See joystick_vehicle_test.json for an example."
+          << std::endl;
+        std::cout << std::endl;
         exit = true;
         break;
       case 'f':
@@ -448,18 +448,19 @@ int main(int argc, char **argv)
 
   if (!exit && !config_file_provided)
   {
-    cout << endl;
-    cout << "Required parameters: " << endl;
-    cout
-      << "    -f <file.json>   The JSON configuration file for all required parameters. See joystick_vehicle_test.json for an example."
-      << endl;
-    cout << endl;
+    std::cout << std::endl;
+    std::cout << "Required parameters: " << std::endl;
+    std::cout
+      << "    -f <file.json>   The JSON configuration file for all required parameters."
+      << " See joystick_vehicle_test.json for an example."
+      << std::endl;
+    std::cout << std::endl;
     exit = true;
   }
 
   if (!exit)
   {
-    //Parse JSON configuration parameters
+    // Parse JSON configuration parameters
     json json_obj = JSON::deserialize(config_file);
     try
     {
@@ -540,9 +541,9 @@ int main(int argc, char **argv)
         steering_exponent == 0 ||
         max_curvature_rate == 0)
     {
-      cout << endl;
-      cerr << "The required parameters were not found in the provided JSON file." << endl;
-      cout << endl;
+      std::cout << std::endl;
+      std::cerr << "The required parameters were not found in the provided JSON file." << std::endl;
+      std::cout << std::endl;
       exit = true;
     }
   }
@@ -572,7 +573,7 @@ int main(int argc, char **argv)
   ros::Subscriber adas_input_sub = n.subscribe("adas_input", 10, inputAdasCallback);
 
   // Wait for time to be valid
-  while (ros::Time::now().nsec == 0);
+  ros::Time::waitForValid();
 
   automotive_platform_msgs::SpeedMode speed_msg;
   automotive_platform_msgs::SteerMode steer_msg;
@@ -592,7 +593,7 @@ int main(int argc, char **argv)
     else if ((now_sec - last_joystick_msg) > joy_fault_timeout)
     {
       // Joystick has timed out
-      cout << "JOYSTICK TIMEOUT" << endl;
+      std::cout << "JOYSTICK TIMEOUT" << std::endl;
       last_joystick_msg = now_sec;
       engaged = 0;
     }
