@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>joystick_vehicle_test</name>
-  <version>2.0.0</version>
-  <description>Sends commands to test the low level vehicle modules</description>
+  <name>ssc_joystick</name>
+  <version>3.0.0</version>
+  <description>Passes driver command from a joystick to the speed and steering control modules</description>
   <license>MIT</license>
 
   <maintainer email="software@autonomoustuff.com">AutonomouStuff Software Team</maintainer>

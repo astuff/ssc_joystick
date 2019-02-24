@@ -1,7 +1,8 @@
 /*
-* Unpublished Copyright (c) 2009-2017 AutonomouStuff, LLC, All Rights Reserved.
+* Unpublished Copyright (c) 2009-2019 AutonomouStuff, LLC, All Rights Reserved.
 *
-* This file is part of the Joystick Vehicle Test ROS 1.0 application which is released under the MIT license.
+* This file is part of the Joystick Speed and Steering Control ROS 1.0 application which is released under the MIT
+* license.
 * See file LICENSE included with this software or go to https://opensource.org/licenses/MIT for full license details.
 */
 
@@ -9,6 +10,7 @@
 
 #include <sensor_msgs/Joy.h>
 #include <diagnostic_msgs/DiagnosticArray.h>
+#include <std_msgs/String.h>
 
 #include <automotive_platform_msgs/GearCommand.h>
 #include <automotive_platform_msgs/GearFeedback.h>
@@ -425,11 +427,11 @@ int main(int argc, char **argv)
     {
       case 'h':
         std::cout << std::endl;
-        std::cout << "Joystick testing for AutonomouStuff Vehicle Control Modules" << std::endl;
+        std::cout << "Joystick Controller for AutonomouStuff Speed and Steering Control Modules" << std::endl;
         std::cout << "    -h             Show this help menu and exit." << std::endl;
         std::cout
           << "    -f <file.json> The JSON configuration file for all remaining parameters."
-          << " See joystick_vehicle_test.json for an example."
+          << " See ssc_joystick.json for an example."
           << std::endl;
         std::cout << std::endl;
         exit = true;
@@ -452,98 +454,61 @@ int main(int argc, char **argv)
     std::cout << "Required parameters: " << std::endl;
     std::cout
       << "    -f <file.json>   The JSON configuration file for all required parameters."
-      << " See joystick_vehicle_test.json for an example."
+      << " See ssc_joystick.json for an example."
       << std::endl;
     std::cout << std::endl;
     exit = true;
   }
 
+  std_msgs::String config_msg;
+
   if (!exit)
   {
     // Parse JSON configuration parameters
-    json json_obj = JSON::deserialize(config_file);
-    try
+    json json_obj = AS::JSON::deserialize(config_file, &config_msg.data);
+
+    bool config_ok = true;
+    std::string mod_name = "ssc joystick";
+
+    config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "publish_interval", ">", 0.0, &publish_interval);
+
+    config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "joy_fault_timeout", ">", 0.0, &joy_fault_timeout);
+
+    config_ok &= AS::readJsonWithError(mod_name, json_obj, "vel_controller_name", &vel_controller_name);
+
+    config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "engage1_button", ">=", 0, &engage1_button);
+    config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "engage2_button", ">=", 0, &engage2_button);
+
+    config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "park_button", ">=", 0, &park_button);
+    config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "neutral_button", ">=", 0, &neutral_button);
+    config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "drive_button", ">=", 0, &drive_button);
+    config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "reverse_button", ">=", 0, &reverse_button);
+
+    config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "right_turn_button", ">=", 0, &right_turn_button);
+    config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "left_turn_button", ">=", 0, &left_turn_button);
+
+    config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "speed_axes", ">=", 0, &speed_axes);
+    config_ok &= AS::readJsonWithError(mod_name, json_obj, "speed_up_sign", &speed_up_sign);
+    config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "speed_step", ">", 0.0f, &speed_step);
+    config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "speed_max", ">", 0.0f, &speed_max);
+    config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "acceleration_limit", ">", 0.0f, &acceleration_limit);
+    config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "deceleration_limit", ">", 0.0f, &deceleration_limit);
+    config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "brake_axes", ">=", 0, &brake_axes);
+    config_ok &= AS::readJsonWithError(mod_name, json_obj, "brake_sign", &brake_sign);
+    config_ok &=
+      AS::readJsonWithLimit(mod_name, json_obj, "max_deceleration_limit", ">", 0.0f, &max_deceleration_limit);
+
+    config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "steer_btn_axes", ">=", 0, &steer_btn_axes);
+    config_ok &= AS::readJsonWithError(mod_name, json_obj, "steer_btn_sign", &steer_btn_sign);
+    config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "steer_btn_step", ">", 0.0f, &steer_btn_step);
+    config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "steering_axes", ">=", 0, &steering_axes);
+    config_ok &= AS::readJsonWithError(mod_name, json_obj, "steering_sign", &steering_sign);
+    config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "steering_gain", ">", 0.0f, &steering_gain);
+    config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "steering_exponent", ">", 0.0f, &steering_exponent);
+    config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "max_curvature_rate", ">", 0.0f, &max_curvature_rate);
+
+    if (!config_ok)
     {
-      publish_interval = json_obj["publish_interval"];
-
-      joy_fault_timeout = json_obj["joy_fault_timeout"];
-
-      vel_controller_name = json_obj["vel_controller_name"];
-
-      engage1_button = json_obj["engage1_button"];
-      engage2_button = json_obj["engage2_button"];
-
-      park_button = json_obj["park_button"];
-      neutral_button = json_obj["neutral_button"];
-      drive_button = json_obj["drive_button"];
-      reverse_button = json_obj["reverse_button"];
-
-      right_turn_button = json_obj["right_turn_button"];
-      left_turn_button = json_obj["left_turn_button"];
-
-      speed_axes = json_obj["speed_axes"];
-      speed_up_sign = json_obj["speed_up_sign"];
-      speed_step = json_obj["speed_step"];
-      speed_max = json_obj["speed_max"];
-      acceleration_limit = json_obj["acceleration_limit"];
-      deceleration_limit = json_obj["deceleration_limit"];
-      brake_axes = json_obj["brake_axes"];
-      brake_sign = json_obj["brake_sign"];
-      max_deceleration_limit = json_obj["max_deceleration_limit"];
-
-      steer_btn_axes = json_obj["steer_btn_axes"];
-      steer_btn_sign = json_obj["steer_btn_sign"];
-      steer_btn_step = json_obj["steer_btn_step"];
-      steering_axes = json_obj["steering_axes"];
-      steering_sign = json_obj["steering_sign"];
-      steering_gain = json_obj["steering_gain"];
-      steering_exponent = json_obj["steering_exponent"];
-      max_curvature_rate = json_obj["max_curvature_rate"];
-    }
-    catch (const std::exception &e)
-    {
-      exit = true;
-    }
-
-    if (publish_interval <= 0.0 ||
-
-        joy_fault_timeout <= 0 ||
-
-        vel_controller_name.empty() ||
-
-        engage1_button < 0 ||
-        engage2_button < 0 ||
-
-        park_button < 0 ||
-        neutral_button < 0 ||
-        drive_button < 0 ||
-        reverse_button < 0 ||
-
-        right_turn_button < 0 ||
-        left_turn_button < 0 ||
-
-        speed_axes < 0 ||
-        speed_up_sign == 0 ||
-        speed_step == 0 ||
-        speed_max == 0 ||
-        acceleration_limit == 0 ||
-        deceleration_limit == 0 ||
-        brake_axes < 0 ||
-        brake_sign == 0 ||
-        max_deceleration_limit == 0 ||
-
-        steer_btn_axes < 0 ||
-        steer_btn_sign == 0 ||
-        steer_btn_step == 0 ||
-        steering_axes < 0 ||
-        steering_sign == 0 ||
-        steering_gain == 0 ||
-        steering_exponent == 0 ||
-        max_curvature_rate == 0)
-    {
-      std::cout << std::endl;
-      std::cerr << "The required parameters were not found in the provided JSON file." << std::endl;
-      std::cout << std::endl;
       exit = true;
     }
   }
@@ -554,15 +519,24 @@ int main(int argc, char **argv)
     return 0;
 
   // ROS initialization
-  ros::init(argc, argv, "joystick_vehicle_test");
+  ros::init(argc, argv, "ssc_joystick");
   ros::NodeHandle n;
   ros::Rate loop_rate(1.0 / publish_interval);
+
+  std::string config_topic = ros::this_node::getName();
+  size_t split = config_topic.find_last_of('/');
+  if (split != std::string::npos)
+  {
+    config_topic = config_topic.substr(split + 1);
+  }
+  config_topic.append("_config");
 
   // Advertise messages to send
   gear_command_pub = n.advertise<automotive_platform_msgs::GearCommand>("gear_select", 1);
   turn_signal_command_pub = n.advertise<automotive_platform_msgs::TurnSignalCommand>("turn_signal_command", 1);
   ros::Publisher speed_pub = n.advertise<automotive_platform_msgs::SpeedMode>("arbitrated_speed_commands", 1);
   ros::Publisher steer_pub = n.advertise<automotive_platform_msgs::SteerMode>("arbitrated_steering_commands", 1);
+  ros::Publisher config_pub = n.advertise<std_msgs::String>(config_topic, 1, true);
 
   // Subscribe to messages to read
   ros::Subscriber state_sub = n.subscribe("module_states", 10, moduleStateCallback);
@@ -574,6 +548,9 @@ int main(int argc, char **argv)
 
   // Wait for time to be valid
   ros::Time::waitForValid();
+
+  // Publish latched message containing the .json config file
+  config_pub.publish(config_msg);
 
   automotive_platform_msgs::SpeedMode speed_msg;
   automotive_platform_msgs::SteerMode steer_msg;
