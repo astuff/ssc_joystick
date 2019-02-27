@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(joystick_vehicle_test)
+project(ssc_joystick)
 
 add_definitions(-std=c++11 -Wall -Wextra)
 
@@ -25,12 +25,12 @@ include_directories(include
   ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(joystick_vehicle_test
-  src/joystick_vehicle_test_ros.cpp
+add_executable(ssc_joystick
+  src/ssc_joystick_ros.cpp
 )
 
-add_dependencies(joystick_vehicle_test ${catkin_EXPORTED_TARGETS})
-target_link_libraries(joystick_vehicle_test ${catkin_LIBRARIES} ASCommon)
+add_dependencies(ssc_joystick ${catkin_EXPORTED_TARGETS})
+target_link_libraries(ssc_joystick ${catkin_LIBRARIES} ASCommon)
 
 roslint_cpp()
 
@@ -44,6 +44,6 @@ install(DIRECTORY launch/
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
 )
 
-install(FILES "joystick_vehicle_test.json"
+install(FILES "ssc_joystick.json"
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )

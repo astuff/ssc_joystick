@@ -1,23 +1,23 @@
-# ROS Joystick Vehicle Test Application #
+# ROS SSC Joystick Application #
 
 [![CircleCI](https://circleci.com/gh/astuff/joystick_vehicle_test/tree/master.svg?style=svg)](https://circleci.com/gh/astuff/joystick_vehicle_test/tree/master)
 
 An application for converting user's joystick commands into gear, steering, speed, and turn signal commands
-to pass to the AutonomouStuff vehicle control software.  Use the launch file provided to start this module,
-the vehicle control software modules, and the drive by wire module.  It is recommended you use the --screen
-option when launching so that you can see the feedback provided by the module.
+to pass to the AutonomouStuff Speed and Steering Control software.  Use the launch file provided to start this module
+and the joy node.  The SSC and drive-by-wire modules need to be started outside of this launch file.
 
-Once the software is running, push either the engage button on the joystick or both the cruise control set/dec and
- decrease gap buttons on the steering wheel to take control with the joystick, ENGAGED will be output to the screen.
-The desired speed defaults to 0 mph when you engage, so the software will automatically engage the brakes.
+Once the software is running, push either both engage buttons on the joystick or both the cruise control set/dec and
+ decrease gap buttons on the steering wheel (not supported on all platforms) to take control with the joystick,
+ ENGAGED will be output to the screen. The desired speed defaults to 0 mph when you engage, so the software will
+ automatically engage the brakes.
 
 You can then press the drive button to place the gear in drive, since the desired speed is still zero the brakes
 will still be applied.  Pressing the speed up and down buttons will increment and decrement by the configured step
 amount, limiting the speed between 0 and the maximum speed set.  Any time a speed button is pressed the new desired
 speed will be output to the screen.  To bring the vehicle to a stop, step the speed back down to zero, and the control
-software will gently apply the brakes to bring the vehicle to a stop.  There is no way through this software to directly
-apply the brakes with the joystick, but the brake pedal can always be applied by the driver to override the joystick
-control mode.
+software will gently apply the brakes to bring the vehicle to a stop.  Pressing the brake trigger will cause the
+desired velocity to drop to zero, effectively applying the brakes. (The brake pedal can always be applied by the driver
+ to override the joystick control mode.)
 
 The steering gain and exponent convert the steering joystick to a desired curvature which is passed down to the
 steering model.  The gain defines the maximum curvature, so the default of 0.12 1/meters allows for a minimum turning
@@ -35,11 +35,8 @@ Pressing either the disengage button on they joystick or both the cruise control
 the steering wheel will give control back to the driver (as will any drive override on the brakes, throttle, or
  steering wheel).  DISENGAGE will be sent to the screen, or a message with information if there was an override.
 
-Note that reverse gear is not currently supported.  The vehicle controller does not support reverse itself, mainly
-because the speed model has not been adequately tested yet in reverse.
-
-It is also intended that this application be used as an example of how to interface to the vehicle control software,
- and can be used as a starting point for the development of higher level autonomy features.
+It is also intended that this application be used as an example of how to interface to the speed and steering control
+ software modules and can be used as a starting point for the development of higher level autonomy features.
 
 # JSON Parameters #
     - publish_interval: The publish interval of the steering and apeed commands, in seconds.
