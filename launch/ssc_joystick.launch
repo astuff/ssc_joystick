@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <launch>
   <arg name="namespace" default="ssc" />
+  <arg name="ssc_joystick_json" default="$(find ssc_joystick)/ssc_joystick.json" />
 
   <remap from="/diagnostics" to="/$(arg namespace)/diagnostics" />
 
@@ -11,7 +12,7 @@
     </node>
 
     <node pkg="ssc_joystick" type="ssc_joystick" name="ssc_joystick"
-          args="-f $(find ssc_joystick)/ssc_joystick.json" output="screen"/>
+          args="-f $(arg ssc_joystick_json)" output="screen"/>
 
   </group>
 </launch>
