@@ -1,6 +1,6 @@
 # ROS SSC Joystick Application #
 
-[![CircleCI](https://circleci.com/gh/astuff/joystick_vehicle_test/tree/master.svg?style=svg)](https://circleci.com/gh/astuff/joystick_vehicle_test/tree/master)
+[![CircleCI](https://circleci.com/gh/astuff/ssc_joystick/tree/master.svg?style=svg)](https://circleci.com/gh/astuff/ssc_joystick/tree/master)
 
 An application for converting user's joystick commands into gear, steering, speed, and turn signal commands
 to pass to the AutonomouStuff Speed and Steering Control software.  Use the launch file provided to start this module
