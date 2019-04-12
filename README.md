@@ -2,7 +2,7 @@
 
 [![CircleCI](https://circleci.com/gh/astuff/ssc_joystick/tree/master.svg?style=svg)](https://circleci.com/gh/astuff/ssc_joystick/tree/master)
 
-#Overview
+# Overview
 The joystick_vehicle_test module is used to verify that the SSC is operational.  It is similar to the ROS joystick node with some notable exceptions. 
 
 This application is intended to convert the user's joystick commands into gear, steering, speed, and turn signal commands
