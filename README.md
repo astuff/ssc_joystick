@@ -70,3 +70,42 @@ It is also intended that this application be used as an example of how to interf
           maximum curvature, in 1/meter
     - steering_exponent: The exponent to control the shape/modulation of the steering command, needs to be >= 1
     - max_curvature_rate: The maximum curvature rate passed to the steering module, in 1/meter/msec
+
+Overview
+The joystick_vehicle_test module is used to verify that the SSC is operational.  It is similar to the ROS joystick node with some notable exceptions. 
+
+It is an open source project with all code available at the following link: https://github.com/astuff/joystick_vehicle_test
+# Configuration Parameters (JSON)
+
+| Parameter  | Default Value  | Description | 
+|:---|:---|:---|
+|publish_interval       |     0.05        |The publish interval of the steering and speed commands, in seconds.
+|joy_fault_timeout      |     3.0         |The timeout before a lack of joystick messages will trigger a fault, in seconds.
+|vel_controller_name    |"/as/veh_controller"|The namespace and name of the vehicle controller ROS node (from the launch file) used to detect overrides and faults in the dbw system
+|engage1_button	      |6 (select)	      |The joystick button used to engage the joystick controller
+|engage2_button	      |7 (start)	      |The joystick button used to disengage the joystick controller
+|park_button	      |3 (triangle)	|The joystick button used to change the gear to park
+neutral_button	      |2 (square)	      |The joystick button used to change the gear to neutral
+reverse_button	      |1 (circle)	      |
+drive_button	      |0 (X)	      |The joystick button used to change the gear to drive
+right_turn_button	      |5 (Right upper)	|The joystick button used to command the right turn signal on
+left_turn_button	      |4( (Left upper)	|The joystick button used to command the left turn signal on
+speed_axes	            |7	            |The joystick axes use to provide speed up and slow down commands
+speed_up_sign	      |1	            |The sign of the speed axes to control which is speed up and which is slow down
+speed_step	            |1.0	            |How much the speed should increase or decrease with each button press, in mph.
+speed_max	            |15.0	            |The maximum speed that can be commanded, in mph.
+acceleration_limit	|2.0	            |The acceleration limit passed to the speed module, in m/s2
+deceleration_limit	|2.5	            |The deceleration limit passed to the speed module, in m/s2
+brake_axes	            |2	            |
+brake_sign	            |1                |	
+max_decceleration_limit	|4.0	            |The maximum deceleration limit in m/s2
+steer_btn_axes	      |6	            |The joystick axes used to step the curvature to the left or right
+steer_btn_sign	      |1	            |Determines which button steps positive (to the left) and negative (to the right)
+steer_btn_step	      |0.01	            |How much to increment or decrement the curvature with each button press
+steering_axes	      |3	            |The joystick axes use to control the desired curvature
+steering_sign	      |1.0	            |The sign of the joystick to control left and right
+steering_gain	      |0.12	            |The gain of the steering, since the joystick is generally -1.0 to 1.0, this is essentially the maximum curvature, in 1/meter
+steering_exponent	      |2.5	            |The exponent to control the shape/modulation of the steering command, needs to be >= 1
+max_curvature_rate	|0.1              |The maximum curvature rate passed to the steering module, in 1/meter/msec
+
+
