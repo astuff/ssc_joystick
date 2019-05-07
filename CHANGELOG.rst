@@ -2,6 +2,18 @@
 Changelog for package joystick_vehicle_test
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#11 <https://github.com/astuff/ssc_joystick/issues/11>`_ from astuff/maint/adding-config-params
+* added config params and button descriptions
+* Fixing _sim launch file.
+* Merge pull request `#10 <https://github.com/astuff/ssc_joystick/issues/10>`_ from astuff/maint/rename_to_ssc_joystick
+* Make json file an arg
+* Rename to ssc_joystick and update readme
+* Merge pull request `#9 <https://github.com/astuff/ssc_joystick/issues/9>`_ from astuff/maint/roslint
+* Adding roslint and implementing suggestions.
+* Contributors: Daniel Stanek, Daniel-Stanek, Joshua Whitley, Sam Rustan, Zach Oakes
+
 2.0.0 (2018-12-03)
 ------------------
 * Merge pull request `#7 <https://github.com/astuff/joystick_vehicle_test/issues/7>`_ from astuff/feature/gazebo-sim
