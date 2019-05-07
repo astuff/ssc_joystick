@@ -126,11 +126,11 @@ workflows:
             branches:
               ignore: /.*/
             tags:
-              only: /^[0-9]*.[0-9]*.[0-9]*$/
+              only: /^[0-9]+\.[0-9]+\.[0-9]+$/
       - melodic_release:
           context: ubuntu-pkg-build
           filters:
             branches:
               ignore: /.*/
             tags:
-              only: /^[0-9]*.[0-9]*.[0-9]*$/
+              only: /^[0-9]+\.[0-9]+\.[0-9]+$/
