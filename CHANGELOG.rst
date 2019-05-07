@@ -2,8 +2,8 @@
 Changelog for package joystick_vehicle_test
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.0 (2019-05-07)
+------------------
 * Merge pull request `#11 <https://github.com/astuff/ssc_joystick/issues/11>`_ from astuff/maint/adding-config-params
 * added config params and button descriptions
 * Fixing _sim launch file.
