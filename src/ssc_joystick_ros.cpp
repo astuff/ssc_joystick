@@ -18,7 +18,7 @@
 #include <automotive_platform_msgs/UserInputADAS.h>
 #include <automotive_platform_msgs/SpeedMode.h>
 #include <automotive_platform_msgs/SteerMode.h>
-#include <automotive_platform_msgs/VelocityAccel.h>
+#include <automotive_platform_msgs/VelocityAccelCov.h>
 #include <automotive_navigation_msgs/ModuleState.h>
 
 #include <Json.hpp>
@@ -352,7 +352,7 @@ void gearFeedbackCallback(const automotive_platform_msgs::GearFeedback::ConstPtr
   current_gear = msg->current_gear.gear;
 }
 
-void velocityCallback(const automotive_platform_msgs::VelocityAccel::ConstPtr& msg)
+void velocityCallback(const automotive_platform_msgs::VelocityAccelCov::ConstPtr& msg)
 {
   current_velocity = msg->velocity;
 }
@@ -543,7 +543,7 @@ int main(int argc, char **argv)
   ros::Subscriber joy_sub = n.subscribe("joy", 10, joystickCallback);
   ros::Subscriber joy_fault_sub = n.subscribe("diagnostics", 10, diagnosticCallback);
   ros::Subscriber gear_sub = n.subscribe("gear_feedback", 10, gearFeedbackCallback);
-  ros::Subscriber velocity_sub = n.subscribe("velocity_accel", 10, velocityCallback);
+  ros::Subscriber velocity_sub = n.subscribe("velocity_accel_cov", 10, velocityCallback);
   ros::Subscriber adas_input_sub = n.subscribe("adas_input", 10, inputAdasCallback);
 
   // Wait for time to be valid
