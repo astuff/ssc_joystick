@@ -87,12 +87,6 @@ void disengage()
 {
   std::cout << "DISENGAGED" << std::endl;
   engaged = 0;
-  if ((current_gear == automotive_platform_msgs::Gear::DRIVE) ||
-      (current_gear == automotive_platform_msgs::Gear::REVERSE))
-  {
-    gear_command_msg.command.gear = automotive_platform_msgs::Gear::PARK;
-    gear_command_pub.publish(gear_command_msg);
-  }
 }
 
 void tryToEngage()
@@ -111,6 +105,7 @@ void tryToEngage()
     std::cout << "ENGAGED" << std::endl;
     desired_speed = 0.0;
     desired_curvature = 0.0;
+    gear_command_msg.command.gear = current_gear;
     engaged = 1;
   }
 }
@@ -173,7 +168,6 @@ void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
     {
       gear_command_msg.command.gear = automotive_platform_msgs::Gear::REVERSE;
     }
-    gear_command_pub.publish(gear_command_msg);
 
     if (msg->buttons.at((unsigned int) right_turn_button) > 0)
     {
@@ -237,7 +231,7 @@ void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
         {
           brake_active = false;
           desired_speed = current_velocity / 0.44704f;
-          desired_speed = speed_step * floor(desired_speed / speed_step);
+          desired_speed = static_cast<float>(speed_step * floor(desired_speed / speed_step));
           speed_updated = true;
           deceleration = deceleration_limit;
         }
@@ -246,7 +240,7 @@ void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
 
     if (speed_updated)
     {
-      desired_speed = speed_step * round(desired_speed / speed_step);
+      desired_speed = static_cast<float> (speed_step * round(desired_speed / speed_step));
 
       if (desired_speed > speed_max)
       {
@@ -270,7 +264,7 @@ void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
         raw *= -1.0f;
         raw_sign = -1.0f;
       }
-      desired_curvature = pow(raw, steering_exponent) * steering_gain * raw_sign;
+      desired_curvature = static_cast<float> (pow(raw, steering_exponent) * steering_gain * raw_sign);
       steering_active_last_loop = true;
     }
     else if (steering_active_last_loop)
@@ -307,7 +301,7 @@ void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
 
       if (steer_updated)
       {
-        desired_curvature = steer_btn_step * round(desired_curvature / steer_btn_step);
+        desired_curvature = static_cast<float> (steer_btn_step * round(desired_curvature / steer_btn_step));
 
         if (desired_curvature > steering_gain)
         {
@@ -389,8 +383,6 @@ void moduleStateCallback(const automotive_navigation_msgs::ModuleState::ConstPtr
       if (dbw_ok && (engaged > 0))
       {
         std::cout << "Joystick control DISENGAGED due to " << msg->info << std::endl;
-        gear_command_msg.command.gear = automotive_platform_msgs::Gear::NEUTRAL;
-        gear_command_pub.publish(gear_command_msg);
         engaged = 0;
       }
       dbw_ok = false;
@@ -588,6 +580,8 @@ int main(int argc, char **argv)
     steer_msg.curvature = desired_curvature;
     steer_msg.max_curvature_rate = max_curvature_rate;
     steer_pub.publish(steer_msg);
+
+    gear_command_pub.publish(gear_command_msg);
 
     turn_signal_command_pub.publish(turn_signal_command_msg);
 
