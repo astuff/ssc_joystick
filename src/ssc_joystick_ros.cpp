@@ -29,6 +29,10 @@ using namespace AS;  // NOLINT
 
 double joy_fault_timeout = 0.0;
 
+bool engage_speed_steering = 1;
+bool engage_only_speed = 0;
+bool engage_only_steering = 0;
+ 
 int engage1_button = -1;
 int engage2_button = -1;
 
@@ -63,6 +67,8 @@ std::string vel_controller_name = "";
 
 bool dbw_ok = false;
 uint16_t engaged = 0;
+uint16_t speed_engaged = 0;
+uint16_t steering_engaged = 0;
 bool engage_pressed = false;
 double last_joystick_msg = 0.0;
 int speed_last = 0;
@@ -106,7 +112,7 @@ void tryToEngage()
     desired_speed = 0.0;
     desired_curvature = 0.0;
     gear_command_msg.command.gear = current_gear;
-    engaged = 1;
+    engaged = 1;    
   }
 }
 
@@ -467,7 +473,11 @@ int main(int argc, char **argv)
     config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "joy_fault_timeout", ">", 0.0, &joy_fault_timeout);
 
     config_ok &= AS::readJsonWithError(mod_name, json_obj, "vel_controller_name", &vel_controller_name);
-
+    
+    config_ok &= AS::readJsonWithError(mod_name, json_obj, "engage_speed_steering", &engage_speed_steering);
+    config_ok &= AS::readJsonWithError(mod_name, json_obj, "engage_only_speed", &engage_only_speed);
+    config_ok &= AS::readJsonWithError(mod_name, json_obj, "engage_only_steering", &engage_only_steering);
+    
     config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "engage1_button", ">=", 0, &engage1_button);
     config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "engage2_button", ">=", 0, &engage2_button);
 
@@ -506,6 +516,16 @@ int main(int argc, char **argv)
   }
 
   deceleration = deceleration_limit;
+  
+  if (engage_only_speed == true && engage_only_steering == true && (engage_speed_steering == false || engage_speed_steering == true))
+  {
+    engage_speed_steering = true;
+    engage_only_speed = engage_only_steering = false;
+  }
+  if (!engage_only_speed && !engage_only_steering && !engage_speed_steering)
+  {
+    std::cout << "\nNO MODULE HAS BEEN SET TO ENGAGE, SSC WILL NOT BE ACTIVE" << std::endl;
+  }
 
   if (exit)
     return 0;
@@ -567,16 +587,29 @@ int main(int argc, char **argv)
       engaged = 0;
     }
 
+    
+    // Set mode on desired module
+    if(engaged == 1)
+    {
+      speed_engaged = engage_only_speed == true ? 1 : 0;
+      steering_engaged = engage_only_steering == true ? 1 : 0;
+    }
+    else
+    {
+      speed_engaged = 0;
+      steering_engaged = 0;
+    }
+    
     // Send output messages
     speed_msg.header.stamp = now;
-    speed_msg.mode = engaged;
+    speed_msg.mode = engage_speed_steering == true ? engaged : speed_engaged;
     speed_msg.speed = desired_speed * 0.44704f;
     speed_msg.acceleration_limit = acceleration_limit;
     speed_msg.deceleration_limit = deceleration;
     speed_pub.publish(speed_msg);
 
     steer_msg.header.stamp = now;
-    steer_msg.mode = engaged;
+    steer_msg.mode = engage_speed_steering == true ? engaged : steering_engaged;
     steer_msg.curvature = desired_curvature;
     steer_msg.max_curvature_rate = max_curvature_rate;
     steer_pub.publish(steer_msg);
