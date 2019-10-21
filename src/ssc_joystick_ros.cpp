@@ -30,8 +30,8 @@ using namespace AS;  // NOLINT
 double joy_fault_timeout = 0.0;
 
 bool engage_speed_steering = 1;
-bool engage_only_speed = 0;
-bool engage_only_steering = 0;
+bool engage_speed_module = 0;
+bool engage_steering_module = 0;
 
 int engage1_button = -1;
 int engage2_button = -1;
@@ -91,7 +91,7 @@ ros::Publisher turn_signal_command_pub;
 void disengage()
 {
   std::cout << "DISENGAGED" << std::endl;
-  engaged = 0;
+  engaged = speed_engaged = steering_engaged = 0;
 }
 
 void tryToEngage()
@@ -338,7 +338,7 @@ void diagnosticCallback(const diagnostic_msgs::DiagnosticArray::ConstPtr& msg)
       if (it->level != diagnostic_msgs::DiagnosticStatus::OK)
       {
         std::cout << "JOYSTICK FAULT" << std::endl;
-        engaged = 0;
+        engaged = speed_engaged = steering_engaged = 0;
         brake_inited = false;
         brake_active = false;
       }
@@ -388,7 +388,7 @@ void moduleStateCallback(const automotive_navigation_msgs::ModuleState::ConstPtr
       if (dbw_ok && (engaged > 0))
       {
         std::cout << "Joystick control DISENGAGED due to " << msg->info << std::endl;
-        engaged = 0;
+        engaged = speed_engaged = steering_engaged = 0;
       }
       dbw_ok = false;
     }
@@ -398,7 +398,7 @@ void moduleStateCallback(const automotive_navigation_msgs::ModuleState::ConstPtr
       {
         std::cout << "Joystick control unavailable due to " << msg->info << std::endl;
         std::cout << "Software must be stopped and restarted once the problem is fixed" << std::endl;
-        engaged = 0;
+        engaged = speed_engaged = steering_engaged = 0;
       }
       dbw_ok = false;
     }
@@ -474,8 +474,8 @@ int main(int argc, char **argv)
     config_ok &= AS::readJsonWithError(mod_name, json_obj, "vel_controller_name", &vel_controller_name);
 
     config_ok &= AS::readJsonWithError(mod_name, json_obj, "engage_speed_steering", &engage_speed_steering);
-    config_ok &= AS::readJsonWithError(mod_name, json_obj, "engage_only_speed", &engage_only_speed);
-    config_ok &= AS::readJsonWithError(mod_name, json_obj, "engage_only_steering", &engage_only_steering);
+    config_ok &= AS::readJsonWithError(mod_name, json_obj, "engage_speed_module", &engage_speed_module);
+    config_ok &= AS::readJsonWithError(mod_name, json_obj, "engage_steering", &engage_steering_module);
 
     config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "engage1_button", ">=", 0, &engage1_button);
     config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "engage2_button", ">=", 0, &engage2_button);
@@ -516,13 +516,12 @@ int main(int argc, char **argv)
 
   deceleration = deceleration_limit;
 
-  if (engage_only_speed == true && engage_only_steering == true &&
-  (engage_speed_steering == false || engage_speed_steering == true))
+  if (engage_speed_module == true && engage_steering_module == true)
   {
     engage_speed_steering = true;
-    engage_only_speed = engage_only_steering = false;
+    engage_speed_module = engage_steering_module = false;
   }
-  if (!engage_only_speed && !engage_only_steering && !engage_speed_steering)
+  else if (!engage_speed_module && !engage_steering_module)
   {
     std::cout << "\nNO MODULE HAS BEEN SET TO ENGAGE, SSC WILL NOT BE ACTIVE" << std::endl;
   }
@@ -584,14 +583,14 @@ int main(int argc, char **argv)
       // Joystick has timed out
       std::cout << "JOYSTICK TIMEOUT" << std::endl;
       last_joystick_msg = now_sec;
-      engaged = 0;
+      engaged = speed_engaged = steering_engaged = 0;
     }
 
     // Set mode on desired module
     if (engaged == 1)
     {
-      speed_engaged = engage_only_speed == true ? 1 : 0;
-      steering_engaged = engage_only_steering == true ? 1 : 0;
+      speed_engaged = engage_speed_module == true ? 1 : 0;
+      steering_engaged = engage_steering_module == true ? 1 : 0;
     }
     else
     {
