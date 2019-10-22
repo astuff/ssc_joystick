@@ -65,8 +65,6 @@ std::string vel_controller_name = "";
 
 bool dbw_ok = false;
 uint16_t engaged = 0;
-uint16_t speed_engaged = 0;
-uint16_t steering_engaged = 0;
 bool engage_pressed = false;
 double last_joystick_msg = 0.0;
 int speed_last = 0;
@@ -90,7 +88,7 @@ ros::Publisher turn_signal_command_pub;
 void disengage()
 {
   std::cout << "DISENGAGED" << std::endl;
-  engaged = speed_engaged = steering_engaged = 0;
+  engaged = 0;
 }
 
 void tryToEngage()
@@ -337,7 +335,7 @@ void diagnosticCallback(const diagnostic_msgs::DiagnosticArray::ConstPtr& msg)
       if (it->level != diagnostic_msgs::DiagnosticStatus::OK)
       {
         std::cout << "JOYSTICK FAULT" << std::endl;
-        engaged = speed_engaged = steering_engaged = 0;
+        engaged = 0;
         brake_inited = false;
         brake_active = false;
       }
@@ -387,7 +385,7 @@ void moduleStateCallback(const automotive_navigation_msgs::ModuleState::ConstPtr
       if (dbw_ok && (engaged > 0))
       {
         std::cout << "Joystick control DISENGAGED due to " << msg->info << std::endl;
-        engaged = speed_engaged = steering_engaged = 0;
+        engaged = 0;
       }
       dbw_ok = false;
     }
@@ -397,7 +395,7 @@ void moduleStateCallback(const automotive_navigation_msgs::ModuleState::ConstPtr
       {
         std::cout << "Joystick control unavailable due to " << msg->info << std::endl;
         std::cout << "Software must be stopped and restarted once the problem is fixed" << std::endl;
-        engaged = speed_engaged = steering_engaged = 0;
+        engaged = 0;
       }
       dbw_ok = false;
     }
@@ -519,15 +517,6 @@ int main(int argc, char **argv)
     std::cout <<"\nSPEED MODULE MODE: " << engage_speed_module <<"\nSTEERING MODULE MODE: " <<
     engage_steering_module << std::endl;
 
-    if (engage_speed_module)
-    {
-      speed_engaged = 1;
-    }
-    else
-    {
-      steering_engaged = 1;
-    }
-
     if (engage_speed_module && engage_steering_module)
     {
       std::cout <<"\nSPEED AND STEERING CONTROL SET TO ENGAGE" << std::endl;
@@ -538,7 +527,7 @@ int main(int argc, char **argv)
   else
   {
     std::cout << "\nNO MODULE HAS BEEN SET TO ENGAGE, SSC WILL NOT BE ACTIVE" << std::endl;
-    engaged = speed_engaged = steering_engaged = 0;
+    engaged = 0;
   }
 
   if (exit)
@@ -598,19 +587,19 @@ int main(int argc, char **argv)
       // Joystick has timed out
       std::cout << "JOYSTICK TIMEOUT" << std::endl;
       last_joystick_msg = now_sec;
-      engaged = speed_engaged = steering_engaged = 0;
+      engaged = 0;
     }
 
     // Send output messages
     speed_msg.header.stamp = now;
-    speed_msg.mode = speed_engaged;
+    speed_msg.mode = engage_speed_module > 0 ? engaged : 0;
     speed_msg.speed = desired_speed * 0.44704f;
     speed_msg.acceleration_limit = acceleration_limit;
     speed_msg.deceleration_limit = deceleration;
     speed_pub.publish(speed_msg);
 
     steer_msg.header.stamp = now;
-    steer_msg.mode = steering_engaged;
+    steer_msg.mode = engage_steering_module > 0 ? engaged : 0;
     steer_msg.curvature = desired_curvature;
     steer_msg.max_curvature_rate = max_curvature_rate;
     steer_pub.publish(steer_msg);
