@@ -521,13 +521,10 @@ int main(int argc, char **argv)
     {
       std::cout <<"\nSPEED AND STEERING CONTROL SET TO ENGAGE" << std::endl;
     }
-
-    engaged = 1;
   }
   else
   {
     std::cout << "\nNO MODULE HAS BEEN SET TO ENGAGE, SSC WILL NOT BE ACTIVE" << std::endl;
-    engaged = 0;
   }
 
   if (exit)
