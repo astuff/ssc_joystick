@@ -48,6 +48,8 @@ It is also intended that this application be used as an example of how to interf
 |publish_interval       |     0.05        |The publish interval of the steering and speed commands, in seconds.
 |joy_fault_timeout      |     3.0         |The timeout before a lack of joystick messages will trigger a fault, in seconds.
 |vel_controller_name    |"/as/veh_controller"|The namespace and name of the vehicle controller ROS node (from the launch file) used to detect overrides and faults in the dbw system
+|engage_speed_module      |     true       |Engage speed control module, steering will be manual unless enabled using engage_only_steering
+|engage_steering_module   |     true       |Engage steering control module, speed will be manual unless enabled using engage_only_speed
 |engage1_button	      |6 (select)	      |The joystick button used to engage the joystick controller
 |engage2_button	      |7 (start)	      |The joystick button used to disengage the joystick controller
 |park_button	      |3 (triangle)	|The joystick button used to change the gear to park

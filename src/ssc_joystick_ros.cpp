@@ -29,9 +29,11 @@ using namespace AS;  // NOLINT
 
 double joy_fault_timeout = 0.0;
 
+bool engage_speed_module = 0;
+bool engage_steering_module = 0;
+
 int engage1_button = -1;
 int engage2_button = -1;
-
 int park_button = -1;
 int neutral_button = -1;
 int drive_button = -1;
@@ -468,6 +470,9 @@ int main(int argc, char **argv)
 
     config_ok &= AS::readJsonWithError(mod_name, json_obj, "vel_controller_name", &vel_controller_name);
 
+    config_ok &= AS::readJsonWithError(mod_name, json_obj, "engage_speed_module", &engage_speed_module);
+    config_ok &= AS::readJsonWithError(mod_name, json_obj, "engage_steering_module", &engage_steering_module);
+
     config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "engage1_button", ">=", 0, &engage1_button);
     config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "engage2_button", ">=", 0, &engage2_button);
 
@@ -506,6 +511,21 @@ int main(int argc, char **argv)
   }
 
   deceleration = deceleration_limit;
+
+  if (engage_speed_module || engage_steering_module)
+  {
+    std::cout <<"\nSPEED MODULE MODE: " << engage_speed_module <<"\nSTEERING MODULE MODE: " <<
+    engage_steering_module << std::endl;
+
+    if (engage_speed_module && engage_steering_module)
+    {
+      std::cout <<"\nSPEED AND STEERING CONTROL SET TO ENGAGE" << std::endl;
+    }
+  }
+  else
+  {
+    std::cout << "\nNO MODULE HAS BEEN SET TO ENGAGE, SSC WILL NOT BE ACTIVE" << std::endl;
+  }
 
   if (exit)
     return 0;
@@ -569,14 +589,14 @@ int main(int argc, char **argv)
 
     // Send output messages
     speed_msg.header.stamp = now;
-    speed_msg.mode = engaged;
+    speed_msg.mode = engage_speed_module > 0 ? engaged : 0;
     speed_msg.speed = desired_speed * 0.44704f;
     speed_msg.acceleration_limit = acceleration_limit;
     speed_msg.deceleration_limit = deceleration;
     speed_pub.publish(speed_msg);
 
     steer_msg.header.stamp = now;
-    steer_msg.mode = engaged;
+    steer_msg.mode = engage_steering_module > 0 ? engaged : 0;
     steer_msg.curvature = desired_curvature;
     steer_msg.max_curvature_rate = max_curvature_rate;
     steer_pub.publish(steer_msg);

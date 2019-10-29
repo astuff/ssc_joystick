@@ -4,6 +4,9 @@
     "joy_fault_timeout": 3.0,
 
     "vel_controller_name": "/ssc/veh_controller",
+    
+    "engage_speed_module": true,
+    "engage_steering_module": true,
 
     "engage1_button": 6,
     "engage2_button": 7,
@@ -34,5 +37,4 @@
     "steering_gain": 0.12,
     "steering_exponent": 2.5,
     "max_curvature_rate": 0.1
-
 }
