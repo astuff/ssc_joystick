@@ -1,21 +1,31 @@
 <?xml version="1.0"?>
-<package format="2">
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
   <name>ssc_joystick</name>
-  <version>3.0.0</version>
+  <version>0.0.1</version>
   <description>Passes driver command from a joystick to the speed and steering control modules</description>
+  <maintainer email="software@autonomoustuff.com">AutonomouStuff Software Development Team</maintainer>
   <license>MIT</license>
-
-  <maintainer email="software@autonomoustuff.com">AutonomouStuff Software Team</maintainer>
+  <url type="bugtracker">https://github.com/astuff/ssc_joystick/issues</url>
+  <url type="repository">https://github.com/astuff/ssc_joystick</url>
+  <author email="jwhitley@autonomoustuff.com">Joshua Whitley</author>
   <author email="dstanek@autonomoustuff.com">Daniel Stanek</author>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <build_depend>roslint</build_depend>
-
-  <depend>roscpp</depend>
+  <depend>rclcpp</depend>
+  <depend>rclcpp_components</depend>
   <depend>std_msgs</depend>
   <depend>sensor_msgs</depend>
   <depend>automotive_platform_msgs</depend>
   <depend>automotive_navigation_msgs</depend>
-  <depend>joy</depend>
+
+  <exec_depend>libas-common</exec_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
 </package>

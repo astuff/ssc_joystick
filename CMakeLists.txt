@@ -1,49 +1,59 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.5)
 project(ssc_joystick)
 
-add_definitions(-std=c++11 -Wall -Wextra)
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+  set(CMAKE_CXX_STANDARD 14)
+endif()
 
-## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS
-  roslint
-  roscpp
-  std_msgs
-  automotive_platform_msgs
-  automotive_navigation_msgs
-  joy
-)
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
 
-## Declare a catkin package
-catkin_package(CATKIN_DEPENDS
-  std_msgs
-  automotive_platform_msgs
-  automotive_navigation_msgs
-)
+find_package(ament_cmake REQUIRED)
+find_package(builtin_interfaces REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rclcpp_components REQUIRED)
 
-## Build executables
-include_directories(include
-  ${catkin_INCLUDE_DIRS}
-)
+find_package(std_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(automotive_platform_msgs REQUIRED)
+find_package(automotive_navigation_msgs REQUIRED)
+
+include_directories(include)
 
 add_executable(ssc_joystick
   src/ssc_joystick_ros.cpp
 )
+ament_target_dependencies(
+  ssc_joystick
+  "rclcpp"
+  "rclcpp_components"
+  "std_msgs"
+  "sensor_msgs"
+  "automotive_platform_msgs"
+  "automotive_navigation_msgs"
+)
+target_link_libraries(
+  ssc_joystick
+  ASCommon
+)
 
-add_dependencies(ssc_joystick ${catkin_EXPORTED_TARGETS})
-target_link_libraries(ssc_joystick ${catkin_LIBRARIES} ASCommon)
-
-roslint_cpp()
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
+endif()
 
 install(TARGETS ${PROJECT_NAME}
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  EXPORT export_${PROJECT_NAME}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
 )
 
-install(DIRECTORY launch/
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+install(
+  DIRECTORY launch
+  DESTINATION share/${PROJECT_NAME}/
 )
 
-install(FILES "ssc_joystick.json"
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
+ament_package()

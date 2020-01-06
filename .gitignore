@@ -6,3 +6,4 @@ bin/
 *~
 .idea/
 cmake-build-debug
+__pycache__
