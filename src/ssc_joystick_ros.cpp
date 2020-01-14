@@ -607,9 +607,6 @@ int main(int argc, char ** argv)
   // Wait for time to be valid
   while (rclcpp::Clock().now().seconds() == 0.0) {}
 
-  apm::msg::SpeedMode speed_msg;
-  apm::msg::SteerMode steer_msg;
-
   std::shared_ptr<rclcpp::TimerBase> timer = node->create_wall_timer(
     std::chrono::duration<double>(publish_interval),
     update);

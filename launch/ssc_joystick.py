@@ -18,15 +18,28 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+import sys
+from ament_index_python.packages import get_package_share_directory
 import launch.actions
 import launch.substitutions
 from launch import LaunchDescription
 import launch_ros.actions
+from launch.actions import IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 
+ssc_package = ''
+for arg in sys.argv:
+    if arg[0:5] == 'ssc:=':
+        ssc_package = arg[5:len(arg)]
+
+if len(ssc_package) == 0:
+    raise Exception('You must specify the ssc package name on the command line (ssc:=ssc_pm_lexus)')
 
 def generate_launch_description():
 
     this_launch_file_dir = launch.substitutions.ThisLaunchFileDir()
+
+    ssc_launch_file_dir = get_package_share_directory(ssc_package)
 
     return LaunchDescription([
         launch_ros.actions.Node(
@@ -41,5 +54,8 @@ def generate_launch_description():
             output='screen',
             node_namespace='ssc',
             arguments=['-f', [this_launch_file_dir, '/ssc_joystick.json']],
+        ),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([ssc_launch_file_dir, '/launch/ssc_dbw.py'])
         )
     ])
