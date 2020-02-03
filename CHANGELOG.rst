@@ -2,6 +2,13 @@
 Changelog for package joystick_vehicle_test
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.0.1 (2020-03-02)
+------------------
+* Added feature - option to enable speed/steering modules individually.
+* Changed logic for the gear selection for faults and enabling
+* Start using velocity_accel_cov instead of velocity_accel, since it's no longer supported
+* Contributors: Daniel Stanek, Joshua Whitley, Sneha Ganesh
+
 3.0.0 (2019-05-07)
 ------------------
 * Merge pull request `#11 <https://github.com/astuff/ssc_joystick/issues/11>`_ from astuff/maint/adding-config-params
@@ -12,7 +19,7 @@ Changelog for package joystick_vehicle_test
 * Rename to ssc_joystick and update readme
 * Merge pull request `#9 <https://github.com/astuff/ssc_joystick/issues/9>`_ from astuff/maint/roslint
 * Adding roslint and implementing suggestions.
-* Contributors: Daniel Stanek, Daniel-Stanek, Joshua Whitley, Sam Rustan, Zach Oakes
+* Contributors: Daniel Stanek, Joshua Whitley, Sam Rustan, Zach Oakes
 
 2.0.0 (2018-12-03)
 ------------------
@@ -44,7 +51,7 @@ Changelog for package joystick_vehicle_test
 * Engage/disengage with steering wheel buttons, add vehicle control monitoring
 * Adjust gains
 * Change desired speed to mph, add exponent factor to steering to provide some modulation, add readme file
-* Contributors: AStuff software team, Daniel Stanek, Daniel-Stanek, Joshua Whitley, Lucas Buckland, Sam Rustan, Zach Oakes
+* Contributors: AStuff software team, Daniel Stanek, Joshua Whitley, Lucas Buckland, Sam Rustan, Zach Oakes
 
 1.0.0 (2017-05-02)
 ------------------
