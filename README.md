@@ -13,6 +13,7 @@ Once the software is running, push either both engage buttons on the joystick or
  decrease gap buttons on the steering wheel (not supported on all platforms) to take control with the joystick,
  ENGAGED will be output to the screen. The desired speed defaults to 0 mph when you engage, so the software will
  automatically engage the brakes.
+ You can also choose to enable the speed and steering modules individually (not supported on all platforms).
 
 You can then press the drive button to place the gear in drive, since the desired speed is still zero the brakes
 will still be applied.  Pressing the speed up and down buttons will increment and decrement by the configured step
