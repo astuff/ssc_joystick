@@ -87,7 +87,7 @@ ros::Publisher turn_signal_command_pub;
 
 void disengage()
 {
-  std::cout << "DISENGAGED" << std::endl;
+  ROS_INFO("DISENGAGED");
   engaged = 0;
 }
 
@@ -95,16 +95,16 @@ void tryToEngage()
 {
   if (!dbw_ok)
   {
-    std::cout << "Drive by wire system not ready to engage" << std::endl;
+    ROS_WARN("Drive by wire system not ready to engage");
   }
   else if ((current_gear != automotive_platform_msgs::Gear::PARK) &&
            (current_gear != automotive_platform_msgs::Gear::NEUTRAL))
   {
-    std::cout << "Gear must be in park or neutral to engage" << std::endl;
+    ROS_WARN("Gear must be in park or neutral to engage");
   }
   else
   {
-    std::cout << "ENGAGED" << std::endl;
+    ROS_INFO("ENGAGED");
     desired_speed = 0.0;
     desired_curvature = 0.0;
     gear_command_msg.command.gear = current_gear;
@@ -151,7 +151,7 @@ void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
     {
       if (current_velocity > 0.1)
       {
-        std::cout << "Must be stopped to change to park" << std::endl;
+        ROS_WARN("Must be stopped to change to park");
       }
       else
       {
@@ -253,7 +253,7 @@ void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
         desired_speed = 0.0;
       }
 
-      std::cout << "Desired Speed: " << desired_speed << std::endl;
+      ROS_INFO("Desired Speed: %f", desired_speed);
     }
 
     float steering = msg->axes.at((unsigned int) steering_axes);
@@ -314,7 +314,7 @@ void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
           desired_curvature = -steering_gain;
         }
 
-        std::cout << "Desired Steering Curvature: " << desired_curvature << std::endl;
+        ROS_INFO("Desired Steering Curvature: %f", desired_curvature);
       }
     }
   }
@@ -334,7 +334,7 @@ void diagnosticCallback(const diagnostic_msgs::DiagnosticArray::ConstPtr& msg)
       last_joystick_msg = msg->header.stamp.toSec();
       if (it->level != diagnostic_msgs::DiagnosticStatus::OK)
       {
-        std::cout << "JOYSTICK FAULT" << std::endl;
+        ROS_ERROR("JOYSTICK FAULT");
         engaged = 0;
         brake_inited = false;
         brake_active = false;
@@ -384,7 +384,7 @@ void moduleStateCallback(const automotive_navigation_msgs::ModuleState::ConstPtr
     {
       if (dbw_ok && (engaged > 0))
       {
-        std::cout << "Joystick control DISENGAGED due to " << msg->info << std::endl;
+        ROS_ERROR("Joystick control DISENGAGED due to %s", msg->info.c_str());
         engaged = 0;
       }
       dbw_ok = false;
@@ -393,8 +393,8 @@ void moduleStateCallback(const automotive_navigation_msgs::ModuleState::ConstPtr
     {
       if (dbw_ok)
       {
-        std::cout << "Joystick control unavailable due to " << msg->info << std::endl;
-        std::cout << "Software must be stopped and restarted once the problem is fixed" << std::endl;
+        ROS_ERROR("Joystick control unavailable due to %s", msg->info.c_str());
+        ROS_ERROR("Software must be stopped and restarted once the problem is fixed");
         engaged = 0;
       }
       dbw_ok = false;
@@ -405,6 +405,10 @@ void moduleStateCallback(const automotive_navigation_msgs::ModuleState::ConstPtr
 // Main routine
 int main(int argc, char **argv)
 {
+  // ROS initialization
+  ros::init(argc, argv, "ssc_joystick");
+  ros::NodeHandle n;
+
   int c;
   bool exit = false;
   bool config_file_provided = false;
@@ -420,14 +424,13 @@ int main(int argc, char **argv)
     switch (c)
     {
       case 'h':
-        std::cout << std::endl;
-        std::cout << "Joystick Controller for AutonomouStuff Speed and Steering Control Modules" << std::endl;
-        std::cout << "    -h             Show this help menu and exit." << std::endl;
-        std::cout
-          << "    -f <file.json> The JSON configuration file for all remaining parameters."
-          << " See ssc_joystick.json for an example."
-          << std::endl;
-        std::cout << std::endl;
+        ROS_INFO_STREAM(
+          std::endl <<
+          "Joystick Controller for AutonomouStuff Speed and Steering Control Modules" << std::endl <<
+          "    -h             Show this help menu and exit." << std::endl <<
+          "    -f <file.json> The JSON configuration file for all remaining parameters." <<
+          " See ssc_joystick.json for an example."
+        );
         exit = true;
         break;
       case 'f':
@@ -444,13 +447,12 @@ int main(int argc, char **argv)
 
   if (!exit && !config_file_provided)
   {
-    std::cout << std::endl;
-    std::cout << "Required parameters: " << std::endl;
-    std::cout
-      << "    -f <file.json>   The JSON configuration file for all required parameters."
-      << " See ssc_joystick.json for an example."
-      << std::endl;
-    std::cout << std::endl;
+    ROS_ERROR_STREAM(
+      std::endl <<
+      "Required parameters: " << std::endl <<
+      "    -f <file.json> The JSON configuration file for all required parameters." <<
+      " See ssc_joystick.json for an example."
+    );
     exit = true;
   }
 
@@ -514,25 +516,23 @@ int main(int argc, char **argv)
 
   if (engage_speed_module || engage_steering_module)
   {
-    std::cout <<"\nSPEED MODULE MODE: " << engage_speed_module <<"\nSTEERING MODULE MODE: " <<
-    engage_steering_module << std::endl;
+    ROS_INFO("SPEED MODULE MODE: %d", engage_speed_module);
+    ROS_INFO("STEERING MODULE MODE: %d", engage_steering_module);
 
     if (engage_speed_module && engage_steering_module)
     {
-      std::cout <<"\nSPEED AND STEERING CONTROL SET TO ENGAGE" << std::endl;
+      ROS_INFO("SPEED AND STEERING CONTROL SET TO ENGAGE");
     }
   }
   else
   {
-    std::cout << "\nNO MODULE HAS BEEN SET TO ENGAGE, SSC WILL NOT BE ACTIVE" << std::endl;
+    ROS_ERROR("NO MODULE HAS BEEN SET TO ENGAGE, SSC WILL NOT BE ACTIVE");
   }
 
   if (exit)
     return 0;
 
-  // ROS initialization
-  ros::init(argc, argv, "ssc_joystick");
-  ros::NodeHandle n;
+  // ROS API
   ros::Rate loop_rate(1.0 / publish_interval);
 
   std::string config_topic = ros::this_node::getName();
@@ -582,7 +582,7 @@ int main(int argc, char **argv)
     else if ((now_sec - last_joystick_msg) > joy_fault_timeout)
     {
       // Joystick has timed out
-      std::cout << "JOYSTICK TIMEOUT" << std::endl;
+      ROS_ERROR("JOYSTICK TIMEOUT");
       last_joystick_msg = now_sec;
       engaged = 0;
     }
