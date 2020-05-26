@@ -429,8 +429,7 @@ int main(int argc, char **argv)
           "Joystick Controller for AutonomouStuff Speed and Steering Control Modules" << std::endl <<
           "    -h             Show this help menu and exit." << std::endl <<
           "    -f <file.json> The JSON configuration file for all remaining parameters." <<
-          " See ssc_joystick.json for an example."
-        );
+          " See ssc_joystick.json for an example.");
         exit = true;
         break;
       case 'f':
@@ -451,8 +450,7 @@ int main(int argc, char **argv)
       std::endl <<
       "Required parameters: " << std::endl <<
       "    -f <file.json> The JSON configuration file for all required parameters." <<
-      " See ssc_joystick.json for an example."
-    );
+      " See ssc_joystick.json for an example.");
     exit = true;
   }
 
