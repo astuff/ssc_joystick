@@ -8,10 +8,20 @@ find_package(catkin REQUIRED COMPONENTS
   roslint
   roscpp
   std_msgs
+  genmsg
   automotive_platform_msgs
   automotive_navigation_msgs
+  message_generation
+  message_filters
   joy
 )
+
+add_message_files(DIRECTORY msg FILES
+  TractorControlMode.msg
+)
+
+generate_messages(DEPENDENCIES std_msgs)
+
 
 ## Declare a catkin package
 catkin_package(CATKIN_DEPENDS
@@ -21,7 +31,7 @@ catkin_package(CATKIN_DEPENDS
 )
 
 ## Build executables
-include_directories(include
+include_directories(include/${PROJECT_NAME}
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -29,8 +39,8 @@ add_executable(ssc_joystick
   src/ssc_joystick_ros.cpp
 )
 
+target_link_libraries(ssc_joystick ASCommon ${catkin_LIBRARIES})
 add_dependencies(ssc_joystick ${catkin_EXPORTED_TARGETS})
-target_link_libraries(ssc_joystick ${catkin_LIBRARIES} ASCommon)
 
 roslint_cpp()
 
@@ -46,4 +56,9 @@ install(DIRECTORY launch/
 
 install(FILES "ssc_joystick.json"
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+
+)
+
+install(DIRECTORY msg/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/msg
 )

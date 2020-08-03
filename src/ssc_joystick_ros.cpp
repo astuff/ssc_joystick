@@ -25,6 +25,8 @@
 #include <GeneralUtils.hpp>
 #include <string>
 
+#include <ssc_joystick/TractorControlMode.h>
+
 using namespace AS;  // NOLINT
 
 double joy_fault_timeout = 0.0;
@@ -548,6 +550,7 @@ int main(int argc, char **argv)
   turn_signal_command_pub = n.advertise<automotive_platform_msgs::TurnSignalCommand>("turn_signal_command", 1);
   ros::Publisher speed_pub = n.advertise<automotive_platform_msgs::SpeedMode>("arbitrated_speed_commands", 1);
   ros::Publisher steer_pub = n.advertise<automotive_platform_msgs::SteerMode>("arbitrated_steering_commands", 1);
+  ros::Publisher tractor_user_pub = n.advertise<ssc_joystick::TractorControlMode>("user_control_commands", 1);
   ros::Publisher config_pub = n.advertise<std_msgs::String>(config_topic, 1, true);
 
   // Subscribe to messages to read
@@ -566,6 +569,7 @@ int main(int argc, char **argv)
 
   automotive_platform_msgs::SpeedMode speed_msg;
   automotive_platform_msgs::SteerMode steer_msg;
+  ssc_joystick::TractorControlMode tractor_msg;
 
   // Loop as long as module should run
   while (ros::ok())
@@ -604,6 +608,17 @@ int main(int argc, char **argv)
     gear_command_pub.publish(gear_command_msg);
 
     turn_signal_command_pub.publish(turn_signal_command_msg);
+
+    tractor_msg.header.stamp = now;
+    tractor_msg.joystick_mode = 0;
+    tractor_msg.rpm_dial_mode = 0;
+    tractor_msg.hydraulics_mode = 0;
+    tractor_msg.joystick_sens = 0;
+    tractor_msg.rpm_dial = 0.0;
+    tractor_msg.hydraulics_in = 0;
+    tractor_msg.hydraulics_implement_id = 0;
+
+    tractor_user_pub.publish(tractor_msg);
 
     // Wait for next loop
     loop_rate.sleep();

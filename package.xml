@@ -12,10 +12,14 @@
 
   <build_depend>roslint</build_depend>
 
+  <build_depend>message_generation</build_depend>
+
   <depend>roscpp</depend>
   <depend>std_msgs</depend>
   <depend>sensor_msgs</depend>
   <depend>automotive_platform_msgs</depend>
   <depend>automotive_navigation_msgs</depend>
   <depend>joy</depend>
+  <depend>message_filters</depend>
+
 </package>
