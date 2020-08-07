@@ -21,5 +21,8 @@
   <depend>automotive_navigation_msgs</depend>
   <depend>joy</depend>
   <depend>message_filters</depend>
+  <depend>pacmod_msgs</depend>
+
+  <exec_depend>message_runtime</exec_depend>
 
 </package>

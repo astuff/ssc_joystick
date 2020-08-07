@@ -78,6 +78,14 @@ bool brake_inited = false;  // Brake axes default is 0 (50%) until it's pressed
 bool brake_active = false;
 float deceleration = 0.0;
 
+uint16_t joy_engage = 0;
+uint16_t rpm_dial_engage = 0;
+uint16_t hydraulics_engage = 0;
+uint8_t joy_sens = 0;
+float rpm_dial_val = 0.0;
+float hyd_in = 0;
+uint16_t hyd_in_id = 0;
+
 uint8_t current_gear = automotive_platform_msgs::Gear::NONE;
 float current_velocity = 1.0;
 
@@ -404,6 +412,30 @@ void moduleStateCallback(const automotive_navigation_msgs::ModuleState::ConstPtr
   }
 }
 
+void userControlCallback(const ssc_joystick::TractorControlMode::ConstPtr& msg)
+{
+  if (dbw_ok)
+  {
+    joy_engage = msg->joystick_mode;
+    rpm_dial_engage = msg->rpm_dial_mode;
+    hydraulics_engage = msg->hydraulics_mode;
+    joy_sens = msg->joystick_sens;
+    rpm_dial_val = msg->rpm_dial;
+    hyd_in = msg->hydraulics_in;
+    hyd_in_id = msg->hydraulics_implement_id;
+  }
+  else
+  {
+    joy_engage = 0;
+    rpm_dial_engage = 0;
+    hydraulics_engage = 0;
+    joy_sens = 0;
+    rpm_dial_val = 0.0;
+    hyd_in = 0;
+    hyd_in_id = 0;
+  }
+}
+
 // Main routine
 int main(int argc, char **argv)
 {
@@ -560,6 +592,7 @@ int main(int argc, char **argv)
   ros::Subscriber gear_sub = n.subscribe("gear_feedback", 10, gearFeedbackCallback);
   ros::Subscriber velocity_sub = n.subscribe("velocity_accel_cov", 10, velocityCallback);
   ros::Subscriber adas_input_sub = n.subscribe("adas_input", 10, inputAdasCallback);
+  ros::Subscriber user_control_sub = n.subscribe("user_values", 10, userControlCallback);
 
   // Wait for time to be valid
   ros::Time::waitForValid();
@@ -610,13 +643,13 @@ int main(int argc, char **argv)
     turn_signal_command_pub.publish(turn_signal_command_msg);
 
     tractor_msg.header.stamp = now;
-    tractor_msg.joystick_mode = 0;
-    tractor_msg.rpm_dial_mode = 0;
-    tractor_msg.hydraulics_mode = 0;
-    tractor_msg.joystick_sens = 0;
-    tractor_msg.rpm_dial = 0.0;
-    tractor_msg.hydraulics_in = 0;
-    tractor_msg.hydraulics_implement_id = 0;
+    tractor_msg.joystick_mode = joy_engage;
+    tractor_msg.rpm_dial_mode = rpm_dial_engage;
+    tractor_msg.hydraulics_mode = hydraulics_engage;
+    tractor_msg.joystick_sens = joy_sens;
+    tractor_msg.rpm_dial = rpm_dial_val;
+    tractor_msg.hydraulics_in = hyd_in;
+    tractor_msg.hydraulics_implement_id = hyd_in_id;
 
     tractor_user_pub.publish(tractor_msg);
 

@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   automotive_navigation_msgs
   message_generation
   message_filters
+  pacmod_msgs
   joy
 )
 
@@ -28,6 +29,7 @@ catkin_package(CATKIN_DEPENDS
   std_msgs
   automotive_platform_msgs
   automotive_navigation_msgs
+  message_runtime
 )
 
 ## Build executables

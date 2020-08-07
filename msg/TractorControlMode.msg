@@ -1,10 +1,11 @@
 # Tractor User Control Commands
 
 # Joystick Levels
-uint8 FIRST = 11
-uint8 SECOND = 12
-uint8 THIRD = 13
-uint8 FOURTH = 14
+uint8 DEFAULT = 0
+uint8 FIRST = 1
+uint8 SECOND = 2
+uint8 THIRD = 3
+uint8 FOURTH = 4
 
 # Hydraulic Implements
 uint16 NONE = 0
