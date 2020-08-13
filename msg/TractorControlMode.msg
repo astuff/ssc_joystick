@@ -24,6 +24,6 @@ uint16 rpm_dial_mode
 uint16 hydraulics_mode
 
 uint8 joystick_sens
-float64 rpm_dial
-float64 hydraulics_in
+float32 rpm_dial
+float32 hydraulics_in
 uint16 hydraulics_implement_id
