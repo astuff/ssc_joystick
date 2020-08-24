@@ -27,3 +27,5 @@ uint8 joystick_sens
 float32 rpm_dial
 float32 hydraulics_in
 uint16 hydraulics_implement_id
+bool beacon_state_in
+bool horn_state_in

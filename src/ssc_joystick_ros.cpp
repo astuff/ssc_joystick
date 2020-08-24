@@ -85,6 +85,8 @@ uint8_t joy_sens = 0;
 float rpm_dial_val = 0.0;
 float hyd_in = 0.0;
 uint16_t hyd_in_id = 0;
+bool beacon_state = 0;
+bool horn_state = 0;
 
 uint8_t current_gear = automotive_platform_msgs::Gear::NONE;
 float current_velocity = 1.0;
@@ -521,6 +523,8 @@ int main(int argc, char **argv)
     config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "rpm_dial_val", ">=", 0.0f, &rpm_dial_val);
     config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "hyd_in", ">=", 0.0f, &hyd_in);
     config_ok &= AS::readJsonWithError(mod_name, json_obj, "hyd_in_id", &hyd_in_id);
+    config_ok &= AS::readJsonWithError(mod_name, json_obj, "beacon_in", &beacon_state);
+    config_ok &= AS::readJsonWithError(mod_name, json_obj, "horn_in", &horn_state);
 
     if (!config_ok)
     {
@@ -646,6 +650,8 @@ int main(int argc, char **argv)
     tractor_msg.rpm_dial = rpm_dial_val;
     tractor_msg.hydraulics_in = hyd_in;
     tractor_msg.hydraulics_implement_id = hyd_in_id;
+    tractor_msg.beacon_state_in = beacon_state;
+    tractor_msg.horn_state_in = horn_state;
 
     tractor_user_pub.publish(tractor_msg);
 

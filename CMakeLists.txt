@@ -44,6 +44,13 @@ add_executable(ssc_joystick
 target_link_libraries(ssc_joystick ASCommon ${catkin_LIBRARIES})
 add_dependencies(ssc_joystick ${catkin_EXPORTED_TARGETS})
 
+add_executable(ssc_pacmod_test
+  src/ssc_pacmod_test.cpp
+)
+
+target_link_libraries(ssc_pacmod_test ASCommon ${catkin_LIBRARIES})
+add_dependencies(ssc_pacmod_test ${catkin_EXPORTED_TARGETS})
+
 roslint_cpp()
 
 install(TARGETS ${PROJECT_NAME}

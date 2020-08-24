@@ -44,5 +44,7 @@
     "joy_sens": 0,
     "rpm_dial_val": 0.0,
     "hyd_in": 0.0,
-    "hyd_in_id": 0
+    "hyd_in_id": 0,
+    "beacon_in": false,
+    "horn_in": false
 }
