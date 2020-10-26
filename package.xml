@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>ssc_joystick</name>
-  <version>3.0.2</version>
+  <version>3.0.1</version>
   <description>Passes driver command from a joystick to the speed and steering control modules</description>
   <license>MIT</license>
 
-  <maintainer email="support.as.ap@hexagon.com">AutonomouStuff Software Team</maintainer>
+  <maintainer email="support.as.ap@hexagon.com">AutonomouStuff Support Team</maintainer>
   <author email="daniel.stanek@hexagon.com">Daniel Stanek</author>
   <author email="sneha.ganesh@hexagon.com">Sneha Ganesh</author>
 
