@@ -2,6 +2,12 @@
 Changelog for package joystick_vehicle_test
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+devel-dbc-extra-3.0.2 (2020-10-26)
+----------------------------------
+* Added Hexagon Tractor.
+* README update - individual module enable support unavailble on all platforms
+* Contributors: Sneha Ganesh
+
 3.0.1 (2020-03-02)
 ------------------
 * Added feature - option to enable speed/steering modules individually.
