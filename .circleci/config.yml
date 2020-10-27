@@ -124,13 +124,11 @@ workflows:
           context: ubuntu-pkg-build
           filters:
             branches:
-              only:
-                - /feature/vehicle_t7f/
               ignore:
                 - master
                 - /.*/
             tags:
-              only: /devel-dbc-extra-^[0-9]+\.[0-9]+\.[0-9]+$/
+              only: /^[0-9]+\.[0-9]+\.[0-9]+$/
       - melodic_release:
           context: ubuntu-pkg-build
           filters:
