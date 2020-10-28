@@ -7,7 +7,7 @@
     "vehicle_platform": "Lexus",
 
     "engage_speed_module": true,
-    "engage_steering_module": false,
+    "engage_steering_module": true,
 
     "engage1_button": 6,
     "engage2_button": 7,
