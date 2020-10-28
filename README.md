@@ -79,7 +79,8 @@ It is also intended that this application be used as an example of how to interf
 |max_curvature_rate           |0.1              |The maximum curvature rate passed to the steering module, in 1/meter/msec
 
 # Vehicle Specific Configuration
-- Hexagon Tractor (refer to TractorControlMode definition in msg/ folder)
+
+Hexagon Tractor (refer to TractorControlMode definition in msg/ folder)
 | Parameter  | Default Value  | Description |
 |:---|:---|:---|
 |joy_engage           |false              |Engage joystick level from user.
