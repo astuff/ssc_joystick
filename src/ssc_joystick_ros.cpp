@@ -557,13 +557,12 @@ int main(int argc, char **argv)
     std::cout << "\nNO MODULE HAS BEEN SET TO ENGAGE, SSC WILL NOT BE ACTIVE" << std::endl;
   }
 
-  if (joy_engage)
-  {
-    std::cout <<"\nUSER JOYSTICK SET TO ENGAGE" << std::endl;
-  }
-
   if (vehicle_platform == "hexagon_tractor")
   {
+    if (joy_engage)
+    {
+      std::cout <<"\nUSER JOYSTICK SET TO ENGAGE" << std::endl;
+    }
     if (hydraulics_engage)
     {
       std::cout <<"\nUSER HYDRAULICS SET TO ENGAGE" << std::endl;
