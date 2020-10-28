@@ -81,6 +81,7 @@ It is also intended that this application be used as an example of how to interf
 # Vehicle Specific Configuration
 - Hexagon Tractor (refer to TractorControlMode definition in msg/ folder)
 | Parameter  | Default Value  | Description |
+|:---|:---|:---|
 |joy_engage           |false              |Engage joystick level from user.
 |rpm_dial_engage           |false              |Engage rpm dial from user.
 |hydraulics_engage           |false              |Engage hydraulics.
