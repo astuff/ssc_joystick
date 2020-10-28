@@ -619,7 +619,9 @@ int main(int argc, char **argv)
 
   automotive_platform_msgs::SpeedMode speed_msg;
   automotive_platform_msgs::SteerMode steer_msg;
-  ssc_joystick::TractorControlMode tractor_msg; // Hexagon tractor specific
+
+  // Hexagon tractor specific
+  ssc_joystick::TractorControlMode tractor_msg;
 
   // Loop as long as module should run
   while (ros::ok())
