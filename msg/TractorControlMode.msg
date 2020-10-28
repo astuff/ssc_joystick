@@ -1,4 +1,4 @@
-# Tractor User Control Commands
+# Hexagon Tractor User Control Commands
 
 # Joystick Levels
 uint8 DEFAULT = 0

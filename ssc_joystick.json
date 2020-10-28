@@ -4,6 +4,7 @@
     "joy_fault_timeout": 3.0,
 
     "vel_controller_name": "/ssc/veh_controller",
+    "vehicle_platform": "Lexus",
 
     "engage_speed_module": true,
     "engage_steering_module": false,
@@ -38,6 +39,7 @@
     "steering_exponent": 2.5,
     "max_curvature_rate": 0.1,
 
+    "_info_" : "Hexagon Tractor Params",
     "joy_engage": false,
     "rpm_dial_engage": false,
     "hydraulics_engage": false,
