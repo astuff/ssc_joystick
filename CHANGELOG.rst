@@ -1,8 +1,8 @@
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Changelog for package joystick_vehicle_test
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Changelog for package ssc_joystick
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-3.0.2 (2020-10-27)
+3.0.2 (2020-10-28)
 ------------------
 * Added Hexagon Tractor - based on <https://github.com/astuff/astuff_sensor_msgs>`_ #edb3bf1 and
 <https://github.com/astuff/pacmod3>`_ #1425e64.
