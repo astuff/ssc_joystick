@@ -132,8 +132,6 @@ workflows:
           context: ubuntu-pkg-build
           filters:
             branches:
-              only:
-                - /feature/vehicle_t7f/
               ignore:
                 - /.*/
             tags:
