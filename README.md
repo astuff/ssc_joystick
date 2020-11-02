@@ -27,7 +27,7 @@ The steering gain and exponent convert the steering joystick to a desired curvat
 steering model.  The gain defines the maximum curvature, so the default of 0.12 1/meters allows for a minimum turning
 radius of about 8 meters.  The exponent controls the shape of the reponse: a number closer to 2 or above will mean
 small joystick movements will translate to very small desired curvatures and therefore steering wheel angles,
-a number closer to 1 will mean the curvature varies more linearly across the full joystick range. 
+a number closer to 1 will mean the curvature varies more linearly across the full joystick range.
 
 The curvature command can also be changed by pressing the left and right steering buttons.  The updated curvature
 will be output to the screen.  The steering joystick will override the value set with the buttons.
@@ -44,37 +44,51 @@ It is also intended that this application be used as an example of how to interf
 
 # Configuration Parameters (JSON)
 
-| Parameter  | Default Value  | Description | 
+| Parameter  | Default Value  | Description |
 |:---|:---|:---|
-|publish_interval       |     0.05        |The publish interval of the steering and speed commands, in seconds.
-|joy_fault_timeout      |     3.0         |The timeout before a lack of joystick messages will trigger a fault, in seconds.
-|vel_controller_name    |"/as/veh_controller"|The namespace and name of the vehicle controller ROS node (from the launch file) used to detect overrides and faults in the dbw system
-|engage_speed_module      |     true       |Engage speed control module, steering will be manual unless enabled using engage_only_steering
-|engage_steering_module   |     true       |Engage steering control module, speed will be manual unless enabled using engage_only_speed
-|engage1_button	      |6 (select)	      |The joystick button used to engage the joystick controller
-|engage2_button	      |7 (start)	      |The joystick button used to disengage the joystick controller
-|park_button	      |3 (triangle)	|The joystick button used to change the gear to park
-neutral_button	      |2 (square)	      |The joystick button used to change the gear to neutral
-reverse_button	      |1 (circle)	      |
-drive_button	      |0 (X)	      |The joystick button used to change the gear to drive
-right_turn_button	      |5 (Right upper)	|The joystick button used to command the right turn signal on
-left_turn_button	      |4( (Left upper)	|The joystick button used to command the left turn signal on
-speed_axes	            |7	            |The joystick axes use to provide speed up and slow down commands
-speed_up_sign	      |1	            |The sign of the speed axes to control which is speed up and which is slow down
-speed_step	            |1.0	            |How much the speed should increase or decrease with each button press, in mph.
-speed_max	            |15.0	            |The maximum speed that can be commanded, in mph.
-acceleration_limit	|2.0	            |The acceleration limit passed to the speed module, in m/s2
-deceleration_limit	|2.5	            |The deceleration limit passed to the speed module, in m/s2
-brake_axes	            |2	            |
-brake_sign	            |1                |	
-max_decceleration_limit	|4.0	            |The maximum deceleration limit in m/s2
-steer_btn_axes	      |6	            |The joystick axes used to step the curvature to the left or right
-steer_btn_sign	      |1	            |Determines which button steps positive (to the left) and negative (to the right)
-steer_btn_step	      |0.01	            |How much to increment or decrement the curvature with each button press
-steering_axes	      |3	            |The joystick axes use to control the desired curvature
-steering_sign	      |1.0	            |The sign of the joystick to control left and right
-steering_gain	      |0.12	            |The gain of the steering, since the joystick is generally -1.0 to 1.0, this is essentially the maximum curvature, in 1/meter
-steering_exponent	      |2.5	            |The exponent to control the shape/modulation of the steering command, needs to be >= 1
-max_curvature_rate	|0.1              |The maximum curvature rate passed to the steering module, in 1/meter/msec
+|publish_interval           |     0.05              |The publish interval of the steering and speed commands, in seconds.
+|joy_fault_timeout           |     3.0              |The timeout before a lack of joystick messages will trigger a fault, in seconds.
+|vel_controller_name           |"/as/veh_controller"              |The namespace and name of the vehicle controller ROS node (from the launch file) used to detect overrides and faults in the dbw system
+|vehicle_platform           |"Lexus"              |The vehicle platform name relevant to Speed and Steering Control configuration (check /ssc/vehicle_platform message, if not available, use default value)
+|engage_speed_module           |true              |Engage speed control module, steering will be manual unless enabled using engage_only_steering
+|engage_steering_module           |true              |Engage steering control module, speed will be manual unless enabled using engage_only_speed
+|engage1_button           |6 (select)              |The joystick button used to engage the joystick controller
+|engage2_button           |7 (start)              |The joystick button used to disengage the joystick controller
+|park_button           |3 (triangle)              |The joystick button used to change the gear to park
+|neutral_button           |2 (square)              |The joystick button used to change the gear to neutral
+|reverse_button           |1 (circle)              |
+|drive_button           |0 (X)              |The joystick button used to change the gear to drive
+|right_turn_button           |5 (Right upper)              |The joystick button used to command the right turn signal on
+|left_turn_button           |4( (Left upper)              |The joystick button used to command the left turn signal on
+|speed_axes           |7              |The joystick axes use to provide speed up and slow down commands
+|speed_up_sign           |1              |The sign of the speed axes to control which is speed up and which is slow down
+|speed_step           |1.0              |How much the speed should increase or decrease with each button press, in mph.
+|speed_max           |15.0              |The maximum speed that can be commanded, in mph.
+|acceleration_limit           |2.0              |The acceleration limit passed to the speed module, in m/s2
+|deceleration_limit           |2.5              |The deceleration limit passed to the speed module, in m/s2
+|brake_axes           |2              |
+|brake_sign           |1              |
+|max_decceleration_limit           |4.0              |The maximum deceleration limit in m/s2
+|steer_btn_axes           |6              |The joystick axes used to step the curvature to the left or right
+|steer_btn_sign           |1              |Determines which button steps positive (to the left) and negative (to the right)
+|steer_btn_step           |0.01              |How much to increment or decrement the curvature with each button press
+|steering_axes           |3              |The joystick axes use to control the desired curvature
+|steering_sign           |1.0              |The sign of the joystick to control left and right
+|steering_gain           |0.12              |The gain of the steering, since the joystick is generally -1.0 to 1.0, this is essentially the maximum curvature, in 1/meter
+|steering_exponent           |2.5              |The exponent to control the shape/modulation of the steering command, needs to be >= 1
+|max_curvature_rate           |0.1              |The maximum curvature rate passed to the steering module, in 1/meter/msec
 
+# Vehicle Specific Configuration
 
+Hexagon Tractor (refer to TractorControlMode definition in msg/ folder)
+| Parameter  | Default Value  | Description |
+|:---|:---|:---|
+|joy_engage           |false              |Engage joystick level from user.
+|rpm_dial_engage           |false              |Engage rpm dial from user.
+|hydraulics_engage           |false              |Engage hydraulics.
+|joy_sens           |0              |Joystick sensitivity level, usage requires "joy engage" to be set to true.
+|rpm_dial_val           |0.0              |RPM command, in percent (0-1), usage requires "rpm dial engage" to be set to true.
+|hyd_in           |0.0              |Hydraulics system command, usage requires "hydraulics engage" to be set to true.
+|hyd_in_id           |0              |Hydraulics system id, usage requires "hydraulics engage" to be set to true.
+|beacon_in           |false              |Turn beacon lights on/off.
+|horn_in           |false              |Turn horn on/off.

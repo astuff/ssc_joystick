@@ -12,7 +12,6 @@
     </node>
 
     <node pkg="ssc_joystick" type="ssc_joystick" name="ssc_joystick"
-          args="-f $(arg ssc_joystick_json)" output="screen"/>
-
+          args="-f $(arg ssc_joystick_json)" output="screen" />
   </group>
 </launch>

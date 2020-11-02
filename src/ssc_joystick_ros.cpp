@@ -25,6 +25,8 @@
 #include <GeneralUtils.hpp>
 #include <string>
 
+#include <ssc_joystick/TractorControlMode.h>
+
 using namespace AS;  // NOLINT
 
 double joy_fault_timeout = 0.0;
@@ -62,6 +64,7 @@ float steering_exponent = 0.0;
 float max_curvature_rate = 0.0;
 
 std::string vel_controller_name = "";
+std::string vehicle_platform = "Lexus";
 
 bool dbw_ok = false;
 uint16_t engaged = 0;
@@ -76,6 +79,16 @@ bool brake_inited = false;  // Brake axes default is 0 (50%) until it's pressed
 bool brake_active = false;
 float deceleration = 0.0;
 
+bool joy_engage = 0;
+bool rpm_dial_engage = 0;
+bool hydraulics_engage = 0;
+uint8_t joy_sens = 0;
+float rpm_dial_val = 0.0;
+float hyd_in = 0.0;
+uint16_t hyd_in_id = 0;
+bool beacon_state = 0;
+bool horn_state = 0;
+
 uint8_t current_gear = automotive_platform_msgs::Gear::NONE;
 float current_velocity = 1.0;
 
@@ -84,6 +97,9 @@ ros::Publisher gear_command_pub;
 
 automotive_platform_msgs::TurnSignalCommand turn_signal_command_msg;
 ros::Publisher turn_signal_command_pub;
+
+bool vehicle_flag;
+ros::Publisher tractor_user_pub;
 
 void disengage()
 {
@@ -469,6 +485,7 @@ int main(int argc, char **argv)
     config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "joy_fault_timeout", ">", 0.0, &joy_fault_timeout);
 
     config_ok &= AS::readJsonWithError(mod_name, json_obj, "vel_controller_name", &vel_controller_name);
+    config_ok &= AS::readJsonWithError(mod_name, json_obj, "vehicle_platform", &vehicle_platform);
 
     config_ok &= AS::readJsonWithError(mod_name, json_obj, "engage_speed_module", &engage_speed_module);
     config_ok &= AS::readJsonWithError(mod_name, json_obj, "engage_steering_module", &engage_steering_module);
@@ -504,6 +521,19 @@ int main(int argc, char **argv)
     config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "steering_exponent", ">", 0.0f, &steering_exponent);
     config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "max_curvature_rate", ">", 0.0f, &max_curvature_rate);
 
+    if (vehicle_platform == "hexagon_tractor")
+    {
+      config_ok &= AS::readJsonWithError(mod_name, json_obj, "joy_engage", &joy_engage);
+      config_ok &= AS::readJsonWithError(mod_name, json_obj, "rpm_dial_engage", &rpm_dial_engage);
+      config_ok &= AS::readJsonWithError(mod_name, json_obj, "hydraulics_engage", &hydraulics_engage);
+      config_ok &= AS::readJsonWithError(mod_name, json_obj, "joy_sens", &joy_sens);
+      config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "rpm_dial_val", ">=", 0.0f, &rpm_dial_val);
+      config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "hyd_in", ">=", 0.0f, &hyd_in);
+      config_ok &= AS::readJsonWithError(mod_name, json_obj, "hyd_in_id", &hyd_in_id);
+      config_ok &= AS::readJsonWithError(mod_name, json_obj, "beacon_in", &beacon_state);
+      config_ok &= AS::readJsonWithError(mod_name, json_obj, "horn_in", &horn_state);
+    }
+
     if (!config_ok)
     {
       exit = true;
@@ -525,6 +555,22 @@ int main(int argc, char **argv)
   else
   {
     std::cout << "\nNO MODULE HAS BEEN SET TO ENGAGE, SSC WILL NOT BE ACTIVE" << std::endl;
+  }
+
+  if (vehicle_platform == "hexagon_tractor")
+  {
+    if (joy_engage)
+    {
+      std::cout <<"\nUSER JOYSTICK SET TO ENGAGE" << std::endl;
+    }
+    if (hydraulics_engage)
+    {
+      std::cout <<"\nUSER HYDRAULICS SET TO ENGAGE" << std::endl;
+    }
+    if (rpm_dial_engage)
+    {
+      std::cout <<"\nUSER RPM DIAL SET TO ENGAGE" << std::endl;
+    }
   }
 
   if (exit)
@@ -550,6 +596,12 @@ int main(int argc, char **argv)
   ros::Publisher steer_pub = n.advertise<automotive_platform_msgs::SteerMode>("arbitrated_steering_commands", 1);
   ros::Publisher config_pub = n.advertise<std_msgs::String>(config_topic, 1, true);
 
+  if (vehicle_platform == "hexagon_tractor")
+  {
+    tractor_user_pub = n.advertise<ssc_joystick::TractorControlMode>("user_control_commands", 1);
+    vehicle_flag = true;
+  }
+
   // Subscribe to messages to read
   ros::Subscriber state_sub = n.subscribe("module_states", 10, moduleStateCallback);
   ros::Subscriber joy_sub = n.subscribe("joy", 10, joystickCallback);
@@ -566,6 +618,9 @@ int main(int argc, char **argv)
 
   automotive_platform_msgs::SpeedMode speed_msg;
   automotive_platform_msgs::SteerMode steer_msg;
+
+  // Hexagon tractor specific
+  ssc_joystick::TractorControlMode tractor_msg;
 
   // Loop as long as module should run
   while (ros::ok())
@@ -604,6 +659,22 @@ int main(int argc, char **argv)
     gear_command_pub.publish(gear_command_msg);
 
     turn_signal_command_pub.publish(turn_signal_command_msg);
+
+    if (vehicle_flag)
+    {
+      tractor_msg.header.stamp = now;
+      tractor_msg.joystick_mode = joy_engage > 0 ? engaged : 0;
+      tractor_msg.rpm_dial_mode = rpm_dial_engage > 0 ? engaged : 0;
+      tractor_msg.hydraulics_mode = hydraulics_engage > 0 ? engaged : 0;
+      tractor_msg.joystick_sens = joy_sens;
+      tractor_msg.rpm_dial = rpm_dial_val;
+      tractor_msg.hydraulics_in = hyd_in;
+      tractor_msg.hydraulics_implement_id = hyd_in_id;
+      tractor_msg.beacon_state_in = beacon_state;
+      tractor_msg.horn_state_in = horn_state;
+
+      tractor_user_pub.publish(tractor_msg);
+    }
 
     // Wait for next loop
     loop_rate.sleep();
