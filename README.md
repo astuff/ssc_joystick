@@ -25,7 +25,7 @@ desired velocity to drop to zero, effectively applying the brakes. (The brake pe
 
 The steering gain and exponent convert the steering joystick to a desired curvature which is passed down to the
 steering model.  The gain defines the maximum curvature, so the default of 0.12 1/meters allows for a minimum turning
-radius of about 8 meters.  The exponent controls the shape of the reponse: a number closer to 2 or above will mean
+radius of about 8 meters.  The exponent controls the shape of the response: a number closer to 2 or above will mean
 small joystick movements will translate to very small desired curvatures and therefore steering wheel angles,
 a number closer to 1 will mean the curvature varies more linearly across the full joystick range.
 
@@ -77,6 +77,8 @@ It is also intended that this application be used as an example of how to interf
 |steering_gain           |0.12              |The gain of the steering, since the joystick is generally -1.0 to 1.0, this is essentially the maximum curvature, in 1/meter
 |steering_exponent           |2.5              |The exponent to control the shape/modulation of the steering command, needs to be >= 1
 |max_curvature_rate           |0.1              |The maximum curvature rate passed to the steering module, in 1/meter/msec
+|test_quick_brake           |false              |Added for testing quick brake condition, quick_brake_speed needs to be > 0 and related mode parameters in SSC's configuration need to be non-zero
+|quick_brake_speed           |0.0              |The speed limit beyond which zero speed is requested with a zero decel
 
 # Vehicle Specific Configuration
 

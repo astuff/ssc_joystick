@@ -79,6 +79,10 @@ bool brake_inited = false;  // Brake axes default is 0 (50%) until it's pressed
 bool brake_active = false;
 float deceleration = 0.0;
 
+// Test quick brake mode
+bool test_quick_brake = false;
+float quick_brake_speed = 0.0;
+
 bool joy_engage = 0;
 bool rpm_dial_engage = 0;
 bool hydraulics_engage = 0;
@@ -209,8 +213,18 @@ void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
     {
       if (speed_last != 1)
       {
-        desired_speed += speed_up_sign * speed_step;
-        speed_updated = true;
+        if (!test_quick_brake ||(test_quick_brake && (desired_speed < quick_brake_speed)))
+        {
+          desired_speed += speed_up_sign * speed_step;
+          speed_updated = true;
+        }
+        else if (test_quick_brake && (desired_speed > quick_brake_speed))
+        {
+          desired_speed = 0.0;
+          deceleration = 0.0;
+
+          std::cout << "Quick Brake Test: Make sure related SSC speed_model.json values are non-zero. " << '\n';
+        }
       }
       speed_last = 1;
     }
@@ -520,6 +534,9 @@ int main(int argc, char **argv)
     config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "steering_gain", ">", 0.0f, &steering_gain);
     config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "steering_exponent", ">", 0.0f, &steering_exponent);
     config_ok &= AS::readJsonWithLimit(mod_name, json_obj, "max_curvature_rate", ">", 0.0f, &max_curvature_rate);
+
+    config_ok &= AS::readJsonWithError(mod_name, json_obj, "test_quick_brake", &test_quick_brake);
+    config_ok &= AS::readJsonWithError(mod_name, json_obj, "quick_brake_speed", &quick_brake_speed);
 
     if (vehicle_platform == "hexagon_tractor")
     {
