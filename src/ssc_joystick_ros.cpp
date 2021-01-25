@@ -222,8 +222,9 @@ void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
         {
           desired_speed = 0.0;
           deceleration = 0.0;
+          speed_updated = true;
 
-          std::cout << "Quick Brake Test: Make sure related SSC speed_model.json values are non-zero. " << '\n';
+          std::cout << "Quick Brake Test: Make sure related SSC values are non-zero." << '\n';
         }
       }
       speed_last = 1;
