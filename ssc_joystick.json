@@ -39,6 +39,9 @@
     "steering_exponent": 2.5,
     "max_curvature_rate": 0.1,
 
+    "test_quick_brake": false,
+    "quick_brake_speed": 0.0,
+
     "_info_" : "Hexagon Tractor Params",
     "joy_engage": false,
     "rpm_dial_engage": false,
