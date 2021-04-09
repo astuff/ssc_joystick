@@ -42,6 +42,10 @@ the steering wheel will give control back to the driver (as will any drive overr
 It is also intended that this application be used as an example of how to interface to the speed and steering control
  software modules and can be used as a starting point for the development of higher level autonomy features.
 
+# Joystick Button Layout
+![Left: Front Layout of logitech Controller; Right: Side-button layout of logitech controller
+](/controller_img.png "controller_img.png")
+
 # Configuration Parameters (JSON)
 
 | Parameter  | Default Value  | Description |
@@ -52,15 +56,15 @@ It is also intended that this application be used as an example of how to interf
 |vehicle_platform           |"Lexus"              |The vehicle platform name relevant to Speed and Steering Control configuration (check /ssc/vehicle_platform message, if not available, use default value)
 |engage_speed_module           |true              |Engage speed control module, steering will be manual unless enabled using engage_only_steering
 |engage_steering_module           |true              |Engage steering control module, speed will be manual unless enabled using engage_only_speed
-|engage1_button           |6 (select)              |The joystick button used to engage the joystick controller
-|engage2_button           |7 (start)              |The joystick button used to disengage the joystick controller
-|park_button           |3 (triangle)              |The joystick button used to change the gear to park
-|neutral_button           |2 (square)              |The joystick button used to change the gear to neutral
-|reverse_button           |1 (circle)              |
-|drive_button           |0 (X)              |The joystick button used to change the gear to drive
-|right_turn_button           |5 (Right upper)              |The joystick button used to command the right turn signal on
-|left_turn_button           |4( (Left upper)              |The joystick button used to command the left turn signal on
-|speed_axes           |7              |The joystick axes use to provide speed up and slow down commands
+|engage1_button           |6 (Upper center button left)              |The joystick button used to engage the joystick controller
+|engage2_button           |7 (Upper center button right)              |The joystick button used to disengage the joystick controller
+|park_button           |3 (Y button)              |The joystick button used to change the gear to park
+|neutral_button           |2 (X button)              |The joystick button used to change the gear to neutral
+|reverse_button           |1 (B button)              |
+|drive_button           |0 (A button)              |The joystick button used to change the gear to drive
+|right_turn_button           |5 (Right bumper)              |The joystick button used to command the right turn signal on
+|left_turn_button           |4( (Left bumper)              |The joystick button used to command the left turn signal on
+|speed_axes           |7 (Directional pad UP/DOWN)              |The joystick axes use to provide speed up and slow down commands
 |speed_up_sign           |1              |The sign of the speed axes to control which is speed up and which is slow down
 |speed_step           |1.0              |How much the speed should increase or decrease with each button press, in mph.
 |speed_max           |15.0              |The maximum speed that can be commanded, in mph.
@@ -69,7 +73,7 @@ It is also intended that this application be used as an example of how to interf
 |brake_axes           |2              |
 |brake_sign           |1              |
 |max_decceleration_limit           |4.0              |The maximum deceleration limit in m/s2
-|steer_btn_axes           |6              |The joystick axes used to step the curvature to the left or right
+|steer_btn_axes           |6 (Directional pad LEFT/RIGHT)             |The joystick axes used to step the curvature to the left or right
 |steer_btn_sign           |1              |Determines which button steps positive (to the left) and negative (to the right)
 |steer_btn_step           |0.01              |How much to increment or decrement the curvature with each button press
 |steering_axes           |3              |The joystick axes use to control the desired curvature
