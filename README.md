@@ -64,7 +64,7 @@ It is also intended that this application be used as an example of how to interf
 |drive_button           |0 (A button)              |The joystick button used to change the gear to drive
 |right_turn_button           |5 (Right bumper)              |The joystick button used to command the right turn signal on
 |left_turn_button           |4( (Left bumper)              |The joystick button used to command the left turn signal on
-|speed_axes           |7 (Directional pad UP|DOWN)              |The joystick axes use to provide speed up and slow down commands
+|speed_axes           |7 (Directional pad UP/DOWN)              |The joystick axes use to provide speed up and slow down commands
 |speed_up_sign           |1              |The sign of the speed axes to control which is speed up and which is slow down
 |speed_step           |1.0              |How much the speed should increase or decrease with each button press, in mph.
 |speed_max           |15.0              |The maximum speed that can be commanded, in mph.
@@ -73,7 +73,7 @@ It is also intended that this application be used as an example of how to interf
 |brake_axes           |2              |
 |brake_sign           |1              |
 |max_decceleration_limit           |4.0              |The maximum deceleration limit in m/s2
-|steer_btn_axes           |6 (Directional pad LEFT|RIGHT)             |The joystick axes used to step the curvature to the left or right
+|steer_btn_axes           |6 (Directional pad LEFT/RIGHT)             |The joystick axes used to step the curvature to the left or right
 |steer_btn_sign           |1              |Determines which button steps positive (to the left) and negative (to the right)
 |steer_btn_step           |0.01              |How much to increment or decrement the curvature with each button press
 |steering_axes           |3              |The joystick axes use to control the desired curvature
