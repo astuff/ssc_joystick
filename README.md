@@ -42,6 +42,10 @@ the steering wheel will give control back to the driver (as will any drive overr
 It is also intended that this application be used as an example of how to interface to the speed and steering control
  software modules and can be used as a starting point for the development of higher level autonomy features.
 
+# Joystick Button Layout
+![Left: Front Layout of logitech Controller; Right: Side-button layout of logitech controller
+](/controller_img.png "controller_img.png")
+
 # Configuration Parameters (JSON)
 
 | Parameter  | Default Value  | Description |
