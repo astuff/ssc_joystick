@@ -35,9 +35,12 @@ will be output to the screen.  The steering joystick will override the value set
 The left and right turn signals can also be controlled with the buttons.  The turn signals will stay on as long
 as the button is pressed.
 
-Pressing either the disengage button on they joystick or both the cruise control set/inc and increase gap buttons on
-the steering wheel will give control back to the driver (as will any drive override on the brakes, throttle, or
- steering wheel).  DISENGAGE will be sent to the screen, or a message with information if there was an override.
+Pressing the disengage button on the joystick will give control back to the driver.
+On supported vehicles, pressing both the cruise control set/inc and increase gap buttons on the steering wheel will
+result in a disengage.
+On vehicles with the default override behavior, any drive override on the brakes, throttle, or steering wheel will also
+result in returning control to the driver.
+DISENGAGE or a message with information for an override will be sent to the screen.
 
 It is also intended that this application be used as an example of how to interface to the speed and steering control
  software modules and can be used as a starting point for the development of higher level autonomy features.
