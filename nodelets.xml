@@ -1,0 +1,9 @@
+<library path="lib/libssc_joystick_nodelet">
+  <class name="ssc_joystick/ssc_joystick_nodelet"
+         type="astuff::SscJoystickNl"
+         base_class_type="nodelet::Nodelet">
+    <description>
+      SSC Joystick Demo
+    </description>
+  </class>
+</library>

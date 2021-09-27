@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <launch>
   <arg name="namespace" default="ssc" />
-  <arg name="ssc_joystick_json" default="$(find ssc_joystick)/ssc_joystick.json" />
 
   <remap from="/diagnostics" to="/$(arg namespace)/diagnostics" />
 
@@ -11,7 +10,8 @@
       <param name="autorepeat_rate" value="20.0"/>
     </node>
 
-    <node pkg="ssc_joystick" type="ssc_joystick" name="ssc_joystick"
-          args="-f $(arg ssc_joystick_json)" output="screen" />
+    <node pkg="ssc_joystick" type="ssc_joystick_node" name="ssc_joystick" output="screen">
+      <rosparam command="load" file="$(find ssc_joystick)/config/params.yaml" />
+    </node>
   </group>
 </launch>
