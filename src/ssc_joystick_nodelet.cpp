@@ -84,7 +84,8 @@ void SscJoystickNl::onInit()
   turn_signal_cmd_pub_ = nh_.advertise<automotive_platform_msgs::TurnSignalCommand>("turn_signal_command", 1);
   speed_cmd_pub_ = nh_.advertise<automotive_platform_msgs::SpeedMode>("arbitrated_speed_commands", 1);
   steer_cmd_pub_ = nh_.advertise<automotive_platform_msgs::SteerMode>("arbitrated_steering_commands", 1);
-  if (tractor_flag_) {
+  if (tractor_flag_)
+  {
     tractor_user_pub_ = nh_.advertise<ssc_joystick::TractorControlMode>("user_control_commands", 1);
   }
 
