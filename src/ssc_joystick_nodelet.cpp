@@ -98,9 +98,8 @@ void SscJoystickNl::loadParams()
   pnh_.param("publish_interval", publish_interval_, 0.05f);
   pnh_.param("joystick_fault_timeout", joystick_fault_timeout_, 3.0f);
 
-  pnh_.param<std::string>("vel_controller_name", vel_controller_name_, "/ssc/veh_controller");
+  pnh_.param<std::string>("veh_controller_name", veh_controller_name_, "/ssc/veh_controller");
   pnh_.param<std::string>("vehicle_platform", vehicle_platform_, "Lexus");
-  pnh_.param("wheel_base", wheel_base_, 2.79f);
 
   pnh_.param("engage_speed_module", engage_speed_module_, true);
   pnh_.param("engage_steering_module", engage_steering_module_, true);
@@ -131,6 +130,7 @@ void SscJoystickNl::loadParams()
   pnh_.param("steering_axes", steering_axes_, 3);
   pnh_.param("steering_sign", steering_sign_, 1.0f);
   pnh_.param("steering_exponent", steering_exponent_, 2.5f);
+  pnh_.param("max_curvature", max_curvature_, 0.12f);
   pnh_.param("max_curvature_rate", max_curvature_rate_, 0.10f);
 
   pnh_.param("test_quick_brake", test_quick_brake_, false);
@@ -457,7 +457,7 @@ void SscJoystickNl::tryToEngage()
 
 void SscJoystickNl::moduleStateCallback(const automotive_navigation_msgs::ModuleState::ConstPtr& msg)
 {
-  if (msg->name == vel_controller_name_)
+  if (msg->name == veh_controller_name_)
   {
     if (msg->state == "not_ready")
     {
@@ -518,7 +518,7 @@ void SscJoystickNl::publishVehicleCommand(const ros::TimerEvent& event)
   steer_cmd_pub_.publish(steer_cmd_msg);
 
   automotive_platform_msgs::GearCommand gear_cmd_msg;
-  gear_cmd_msg.command.gear = current_gear_;
+  gear_cmd_msg.command.gear = desired_gear_;
   gear_cmd_pub_.publish(gear_cmd_msg);
 
   automotive_platform_msgs::TurnSignalCommand turn_signal_cmd_msg;

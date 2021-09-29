@@ -125,9 +125,8 @@ private:
   float max_curvature_rate_ = 0.0;
   float steering_exponent_ = 0.0;
 
-  std::string vel_controller_name_ = "";
+  std::string veh_controller_name_ = "";
   std::string vehicle_platform_ = "Lexus";
-  float wheel_base_ = 2.79;
 
   bool dbw_ok_ = false;
   bool engage_pressed_ = false;
