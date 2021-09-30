@@ -1,7 +1,6 @@
 publish_interval: 0.05
 joystick_fault_timeout: 3.0
 vel_controller_name: /ssc/veh_controller
-vehicle_platform: Lexus
 wheel_base: 2.79
 engage_speed_module: true
 engage_steering_module: true
@@ -31,15 +30,5 @@ steering_sign: 1.0
 steering_exponent: 2.5
 max_curvature: 0.12
 max_curvature_rate: 0.1
-
 test_quick_brake: false
 quick_brake_speed: 0.0
-joy_engage: false
-rpm_dial_engage: false
-hydraulics_engage: false
-joy_sens: 0
-rpm_dial_val: 0.0
-hyd_in: 0.0
-hyd_in_id: 0
-beacon_in: false
-horn_in: false

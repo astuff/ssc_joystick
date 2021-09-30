@@ -9,19 +9,11 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   nodelet
   std_msgs
-  genmsg
   automotive_platform_msgs
   automotive_navigation_msgs
-  message_generation
   pacmod_msgs
   joy
 )
-
-add_message_files(DIRECTORY msg FILES
-  TractorControlMode.msg
-)
-
-generate_messages(DEPENDENCIES std_msgs)
 
 ## Declare a catkin package
 catkin_package(CATKIN_DEPENDS
@@ -78,4 +70,8 @@ install(DIRECTORY launch config
 
 install(FILES nodelets.xml
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
+
+install(DIRECTORY include/${PROJECT_NAME}/
+    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )

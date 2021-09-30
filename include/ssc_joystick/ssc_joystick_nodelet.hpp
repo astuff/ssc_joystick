@@ -142,17 +142,6 @@ private:
   bool test_quick_brake_ = false;
   float quick_brake_speed_ = 0.0;
 
-  bool joy_engage_ = false;
-  bool rpm_dial_engage_ = false;
-  bool hydraulics_engage_ = false;
-  uint8_t joy_sens_ = 0;
-  float rpm_dial_val_ = 0.0;
-  float hyd_in_ = 0.0;
-  uint16_t hyd_in_id_ = 0;
-  bool beacon_state_ = false;
-  bool horn_state_ = false;
-  bool tractor_flag_ = false;
-
   uint8_t current_gear_ = automotive_platform_msgs::Gear::NONE;
   float current_velocity_ = 1.0;
 
