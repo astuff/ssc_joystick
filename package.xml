@@ -20,7 +20,6 @@
   <depend>automotive_platform_msgs</depend>
   <depend>automotive_navigation_msgs</depend>
   <depend>joy</depend>
-  <depend>pacmod_msgs</depend>
 
   <export>
     <nodelet plugin="${prefix}/nodelets.xml"/>

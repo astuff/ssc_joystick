@@ -11,7 +11,6 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   automotive_platform_msgs
   automotive_navigation_msgs
-  pacmod_msgs
   joy
 )
 
