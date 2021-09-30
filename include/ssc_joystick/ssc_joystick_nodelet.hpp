@@ -24,9 +24,7 @@
 #include <string>
 
 #include <ros/ros.h>
-#include <ros/package.h>
 #include <nodelet/nodelet.h>
-#include <pluginlib/class_list_macros.h>
 
 #include <sensor_msgs/Joy.h>
 #include <diagnostic_msgs/DiagnosticArray.h>
