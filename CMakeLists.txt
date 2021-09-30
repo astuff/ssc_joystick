@@ -1,18 +1,18 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(ssc_joystick)
 
-add_definitions(-std=c++11 -Wall -Wextra)
+set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra ${CMAKE_CXX_FLAGS}")
 
 ## Find catkin and any catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roslint
   roscpp
+  nodelet
   std_msgs
   genmsg
   automotive_platform_msgs
   automotive_navigation_msgs
   message_generation
-  message_filters
   pacmod_msgs
   joy
 )
@@ -23,44 +23,59 @@ add_message_files(DIRECTORY msg FILES
 
 generate_messages(DEPENDENCIES std_msgs)
 
-
 ## Declare a catkin package
 catkin_package(CATKIN_DEPENDS
-  std_msgs
-  automotive_platform_msgs
-  automotive_navigation_msgs
-  message_runtime
+    INCLUDE_DIRS include
+    CATKIN_DEPENDS ${catkin_deps}
+    LIBRARIES ${PROJECT_NAME}_nodelet
 )
 
+###########
+## Build ##
+###########
+
 ## Build executables
-include_directories(include/${PROJECT_NAME}
+include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(ssc_joystick
-  src/ssc_joystick_ros.cpp
+# nodelet
+add_library(${PROJECT_NAME}_nodelet
+    src/${PROJECT_NAME}_nodelet.cpp
 )
 
-target_link_libraries(ssc_joystick ASCommon ${catkin_LIBRARIES})
-add_dependencies(ssc_joystick ${catkin_EXPORTED_TARGETS})
+target_link_libraries(${PROJECT_NAME}_nodelet
+    ${catkin_LIBRARIES}
+)
+
+# node
+add_executable(${PROJECT_NAME}_node
+    src/ssc_joystick_node.cpp
+)
+
+target_link_libraries(${PROJECT_NAME}_node
+    ${catkin_LIBRARIES}
+)
 
 roslint_cpp()
 
-install(TARGETS ${PROJECT_NAME}
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+#############
+## Install ##
+#############
+
+install(TARGETS
+    ${PROJECT_NAME}_node
+    ${PROJECT_NAME}_nodelet
+    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-install(DIRECTORY launch/
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+install(DIRECTORY launch config
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
-install(FILES "ssc_joystick.json"
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-
-)
-
-install(DIRECTORY msg/
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/msg
+install(FILES nodelets.xml
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
