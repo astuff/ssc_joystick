@@ -11,7 +11,6 @@
   <author email="jilin.zhou@autonomoustuff.com">Jilin Zhou</author>
 
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>message_generation</build_depend>
   <build_depend>roslint</build_depend>
 
   <depend>roscpp</depend>
@@ -21,9 +20,6 @@
   <depend>automotive_platform_msgs</depend>
   <depend>automotive_navigation_msgs</depend>
   <depend>joy</depend>
-  <depend>pacmod_msgs</depend>
-
-  <exec_depend>message_runtime</exec_depend>
 
   <export>
     <nodelet plugin="${prefix}/nodelets.xml"/>

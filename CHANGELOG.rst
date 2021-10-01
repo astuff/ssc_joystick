@@ -1,7 +1,6 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package ssc_joystick
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 3.0.2 (2020-10-28)
 ------------------
 * Added Hexagon Tractor - based on https://github.com/astuff/astuff_sensor_msgs #edb3bf1 and https://github.com/astuff/pacmod3 #1425e64.

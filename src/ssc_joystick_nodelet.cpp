@@ -18,12 +18,13 @@
  * MAY DESCRIBE, IN WHOLE OR IN PART.
  */
 
-#include "ssc_joystick/ssc_joystick_nodelet.hpp"
-#include <ssc_joystick/TractorControlMode.h>
-
 #include <math.h>
 #include <algorithm>
 #include <string>
+
+#include <pluginlib/class_list_macros.h>
+
+#include "ssc_joystick/ssc_joystick_nodelet.hpp"
 
 namespace astuff
 {
@@ -85,10 +86,6 @@ void SscJoystickNl::onInit()
   turn_signal_cmd_pub_ = nh_.advertise<automotive_platform_msgs::TurnSignalCommand>("turn_signal_command", 1);
   speed_cmd_pub_ = nh_.advertise<automotive_platform_msgs::SpeedMode>("arbitrated_speed_commands", 1);
   steer_cmd_pub_ = nh_.advertise<automotive_platform_msgs::SteerMode>("arbitrated_steering_commands", 1);
-  if (tractor_flag_)
-  {
-    tractor_user_pub_ = nh_.advertise<ssc_joystick::TractorControlMode>("user_control_commands", 1);
-  }
 
   // Vehicle command timer
   vehicle_cmd_timer_ = nh_.createTimer(ros::Duration(publish_interval_), &SscJoystickNl::publishVehicleCommand, this);
@@ -101,8 +98,6 @@ void SscJoystickNl::loadParams()
   pnh_.param("joystick_fault_timeout", joystick_fault_timeout_, 3.0f);
 
   pnh_.param<std::string>("veh_controller_name", veh_controller_name_, "/ssc/veh_controller");
-  pnh_.param<std::string>("vehicle_platform", vehicle_platform_, "Lexus");
-
   pnh_.param("engage_speed_module", engage_speed_module_, true);
   pnh_.param("engage_steering_module", engage_steering_module_, true);
   pnh_.param("engage1_button", engage1_button_, 6);
@@ -137,38 +132,6 @@ void SscJoystickNl::loadParams()
 
   pnh_.param("test_quick_brake", test_quick_brake_, false);
   pnh_.param("quick_brake_speed", quick_brake_speed_, 0.0f);
-
-  if (vehicle_platform_ == "hexagon_tractor")
-  {
-    pnh_.param("joy_engage", joy_engage_, false);
-    pnh_.param("rpm_dial_engage", rpm_dial_engage_, false);
-    pnh_.param("hydraulics_engage", hydraulics_engage_, false);
-    int32_t joy_sens = 0;
-    pnh_.param("joy_sens", joy_sens, 0);
-    if (joy_sens < 0)
-    {
-      NODELET_ERROR("Negative joy_sens is invalid");
-    }
-    else
-    {
-      joy_sens_ = static_cast<uint8_t>(joy_sens);
-    }
-    pnh_.param("rpm_dial_val", rpm_dial_val_, 0.0f);
-    pnh_.param("hyd_in", hyd_in_, 0.0f);
-    int32_t hyd_in_id = 0;
-    pnh_.param("hyd_in_id", hyd_in_id, 0);
-    if (hyd_in_id < 0)
-    {
-      NODELET_ERROR("Negative hyd_in_id is invalid");
-    }
-    else
-    {
-      hyd_in_id_ = static_cast<uint16_t>(hyd_in_id);
-    }
-    pnh_.param("beacon_in", beacon_state_, false);
-    pnh_.param("horn_in", horn_state_, false);
-    tractor_flag_ = true;
-  }
 
   NODELET_INFO("Parameters Loaded");
 }
@@ -259,7 +222,7 @@ void SscJoystickNl::joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
           deceleration_ = 0.0;
           speed_updated = true;
 
-          std::cout << "Quick Brake Test: Make sure related SSC values are non-zero." << '\n';
+          NODELET_INFO("Quick Brake Test: Make sure related SSC values are non-zero.");
         }
       }
       speed_last_ = 1;
@@ -473,7 +436,7 @@ void SscJoystickNl::moduleStateCallback(const automotive_navigation_msgs::Module
     {
       if (dbw_ok_ && (engaged_ > 0))
       {
-        std::cout << "Joystick control DISENGAGED due to " << msg->info << std::endl;
+        NODELET_WARN("Joystick control DISENGAGED due to %s", msg->info.c_str());
         engaged_ = 0;
       }
       dbw_ok_ = false;
@@ -482,8 +445,8 @@ void SscJoystickNl::moduleStateCallback(const automotive_navigation_msgs::Module
     {
       if (dbw_ok_)
       {
-        std::cout << "Joystick control unavailable due to " << msg->info << std::endl;
-        std::cout << "Software must be stopped and restarted once the problem is fixed" << std::endl;
+        NODELET_WARN("Joystick control unavailable due to %s", msg->info.c_str());
+        NODELET_WARN("Software must be stopped and restarted once the problem is fixed");
         engaged_ = 0;
       }
       dbw_ok_ = false;
@@ -535,22 +498,6 @@ void SscJoystickNl::publishVehicleCommand(const ros::TimerEvent& event)
   }
   turn_signal_cmd_msg.turn_signal = desired_turn_signal_;
   turn_signal_cmd_pub_.publish(turn_signal_cmd_msg);
-
-  if (tractor_flag_)
-  {
-    ssc_joystick::TractorControlMode tractor_msg;
-    tractor_msg.header.stamp = current_time;
-    tractor_msg.joystick_mode = joy_engage_ > 0 ? engaged_ : 0;
-    tractor_msg.rpm_dial_mode = rpm_dial_engage_ > 0 ? engaged_ : 0;
-    tractor_msg.hydraulics_mode = hydraulics_engage_ > 0 ? engaged_ : 0;
-    tractor_msg.joystick_sens = joy_sens_;
-    tractor_msg.rpm_dial = rpm_dial_val_;
-    tractor_msg.hydraulics_in = hyd_in_;
-    tractor_msg.hydraulics_implement_id = hyd_in_id_;
-    tractor_msg.beacon_state_in = beacon_state_;
-    tractor_msg.horn_state_in = horn_state_;
-    tractor_user_pub_.publish(tractor_msg);
-  }
 }
 }  // namespace astuff
 

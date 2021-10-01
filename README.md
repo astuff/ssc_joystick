@@ -86,18 +86,3 @@ It is also intended that this application be used as an example of how to interf
 |max_curvature_rate           |0.1              |The maximum curvature rate passed to the steering module, in 1/meter/msec
 |test_quick_brake           |false              |Added for testing quick brake condition, quick_brake_speed needs to be > 0 and related mode parameters in SSC's configuration need to be non-zero
 |quick_brake_speed           |0.0              |The speed limit beyond which zero speed is requested with a zero decel
-
-# Vehicle Specific Configuration
-
-Hexagon Tractor (refer to TractorControlMode definition in msg/ folder)
-| Parameter  | Default Value  | Description |
-|:---|:---|:---|
-|joy_engage           |false              |Engage joystick level from user.
-|rpm_dial_engage           |false              |Engage rpm dial from user.
-|hydraulics_engage           |false              |Engage hydraulics.
-|joy_sens           |0              |Joystick sensitivity level, usage requires "joy engage" to be set to true.
-|rpm_dial_val           |0.0              |RPM command, in percent (0-1), usage requires "rpm dial engage" to be set to true.
-|hyd_in           |0.0              |Hydraulics system command, usage requires "hydraulics engage" to be set to true.
-|hyd_in_id           |0              |Hydraulics system id, usage requires "hydraulics engage" to be set to true.
-|beacon_in           |false              |Turn beacon lights on/off.
-|horn_in           |false              |Turn horn on/off.
