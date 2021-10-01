@@ -79,6 +79,7 @@ void SscJoystickNl::onInit()
   gear_sub_ = nh_.subscribe("gear_feedback", 10, &SscJoystickNl::gearFeedbackCallback, this);
   velocity_sub_ = nh_.subscribe("velocity_accel_cov", 10, &SscJoystickNl::velocityCallback, this);
   adas_input_sub_ = nh_.subscribe("adas_input", 10, &SscJoystickNl::inputAdasCallback, this);
+  module_state_sub_ = nh_.subscribe("module_states", 10, &SscJoystickNl::moduleStateCallback, this);
 
   // Publishers
   gear_cmd_pub_ = nh_.advertise<automotive_platform_msgs::GearCommand>("gear_select", 1);
