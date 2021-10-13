@@ -20,9 +20,10 @@
 
 #include "ssc_joystick/ssc_joystick_nodelet.hpp"
 
-#include <math.h>
 #include <algorithm>
+#include <math.h>
 #include <string>
+#include <utility>
 
 #include <pluginlib/class_list_macros.h>
 
