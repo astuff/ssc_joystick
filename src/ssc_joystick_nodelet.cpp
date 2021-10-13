@@ -138,6 +138,24 @@ void SscJoystickNl::loadParams()
 
 void SscJoystickNl::joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
 {
+  createEngageCommand(msg);
+
+  if (engaged_)
+  {
+    createShiftCommand(msg);
+    createSpeedCommand(msg);
+    createSteeringCommand(msg);
+    createAuxCommand(msg);
+  }
+  else
+  {
+    desired_velocity_ = 0.0;
+    desired_curvature_ = 0.0;
+  }
+}
+
+void SscJoystickNl::createEngageCommand(const sensor_msgs::Joy::ConstPtr& msg)
+{
   if ((msg->buttons.at((uint32_t)engage1_button_) > 0) && (msg->buttons.at((uint32_t)engage2_button_) > 0))
   {
     if (!engage_pressed_)
@@ -165,188 +183,192 @@ void SscJoystickNl::joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
   {
     engage_pressed_ = false;
   }
+}
 
-  if (engaged_)
+void SscJoystickNl::createShiftCommand(const sensor_msgs::Joy::ConstPtr& msg)
+{
+  if (msg->buttons.at((uint32_t)park_button_) > 0)
   {
-    if (msg->buttons.at((uint32_t)park_button_) > 0)
+    if (current_velocity_ > 0.1)
     {
-      if (current_velocity_ > 0.1)
-      {
-        NODELET_WARN("Must be stopped to change to park");
-      }
-      else
-      {
-        desired_gear_ = automotive_platform_msgs::Gear::PARK;
-      }
-    }
-    else if (msg->buttons.at((uint32_t)neutral_button_) > 0)
-    {
-      desired_gear_ = automotive_platform_msgs::Gear::NEUTRAL;
-    }
-    else if (msg->buttons.at((uint32_t)drive_button_) > 0)
-    {
-      desired_gear_ = automotive_platform_msgs::Gear::DRIVE;
-    }
-    else if (msg->buttons.at((uint32_t)reverse_button_) > 0)
-    {
-      desired_gear_ = automotive_platform_msgs::Gear::REVERSE;
-    }
-
-    if (msg->buttons.at((uint32_t)right_turn_button_) > 0)
-    {
-      desired_turn_signal_ = automotive_platform_msgs::TurnSignalCommand::RIGHT;
-    }
-    else if (msg->buttons.at((uint32_t)left_turn_button_) > 0)
-    {
-      desired_turn_signal_ = automotive_platform_msgs::TurnSignalCommand::LEFT;
+      NODELET_WARN("Must be stopped to change to park");
     }
     else
     {
-      desired_turn_signal_ = automotive_platform_msgs::TurnSignalCommand::NONE;
+      desired_gear_ = automotive_platform_msgs::Gear::PARK;
     }
+  }
+  else if (msg->buttons.at((uint32_t)neutral_button_) > 0)
+  {
+    desired_gear_ = automotive_platform_msgs::Gear::NEUTRAL;
+  }
+  else if (msg->buttons.at((uint32_t)drive_button_) > 0)
+  {
+    desired_gear_ = automotive_platform_msgs::Gear::DRIVE;
+  }
+  else if (msg->buttons.at((uint32_t)reverse_button_) > 0)
+  {
+    desired_gear_ = automotive_platform_msgs::Gear::REVERSE;
+  }
+}
 
-    float speed = msg->axes.at((uint32_t)speed_axes_);
-    bool speed_updated = false;
-    if (speed > 0.1)
+void SscJoystickNl::createSpeedCommand(const sensor_msgs::Joy::ConstPtr& msg)
+{
+  float speed = msg->axes.at((uint32_t)speed_axes_);
+  bool speed_updated = false;
+  if (speed > 0.1)
+  {
+    if (speed_last_ != 1)
     {
-      if (speed_last_ != 1)
+      if (!test_quick_brake_ || (test_quick_brake_ && (desired_velocity_ < quick_brake_speed_)))
       {
-        if (!test_quick_brake_ || (test_quick_brake_ && (desired_velocity_ < quick_brake_speed_)))
-        {
-          desired_velocity_ += speed_up_sign_ * speed_step_;
-          speed_updated = true;
-        }
-        else if (test_quick_brake_ && (desired_velocity_ > quick_brake_speed_))
-        {
-          desired_velocity_ = 0.0;
-          deceleration_ = 0.0;
-          speed_updated = true;
-
-          NODELET_INFO("Quick Brake Test: Make sure related SSC values are non-zero.");
-        }
-      }
-      speed_last_ = 1;
-    }
-    else if (speed < -0.1)
-    {
-      if (speed_last_ != -1)
-      {
-        desired_velocity_ -= speed_up_sign_ * speed_step_;
+        desired_velocity_ += speed_up_sign_ * speed_step_;
         speed_updated = true;
       }
-      speed_last_ = -1;
-    }
-    else
-    {
-      speed_last_ = 0;
-    }
-
-    float brake = msg->axes.at((uint32_t)brake_axes_);
-    if (brake != 0.0 || brake_initialized_)
-    {
-      brake_initialized_ = true;
-      brake *= brake_sign_;
-      if (brake < 0.95f)
-      {
-        if (!brake_active_)
-        {
-          brake_active_ = true;
-          desired_velocity_ = 0.0f;
-          speed_updated = true;
-        }
-        auto map2pt = [](float in, float min_in, float max_in, float min_out, float max_out) {  // NOLINT
-          float out;
-          if (in <= min_in)
-            out = min_out;
-          else if (in >= max_in)
-            out = max_out;
-          else
-            out = (in - min_in) / (max_in - min_in) * (max_out - min_out) + min_out;
-          return out;
-        };
-        deceleration_ = map2pt(brake, -0.95f, 0.95f, max_deceleration_limit_, deceleration_limit_);
-      }
-      else
-      {
-        if (brake_active_)
-        {
-          brake_active_ = false;
-          // convert from m/s to mph
-          desired_velocity_ = current_velocity_ / 0.44704f;
-          desired_velocity_ = static_cast<float>(speed_step_ * std::floor(desired_velocity_ / speed_step_));
-          speed_updated = true;
-          deceleration_ = deceleration_limit_;
-        }
-      }
-    }
-
-    if (speed_updated)
-    {
-      desired_velocity_ = static_cast<float>(speed_step_ * std::round(desired_velocity_ / speed_step_));
-
-      if (desired_velocity_ > max_speed_)
-      {
-        desired_velocity_ = max_speed_;
-      }
-      else if (desired_velocity_ < 0.1)
+      else if (test_quick_brake_ && (desired_velocity_ > quick_brake_speed_))
       {
         desired_velocity_ = 0.0;
-      }
+        deceleration_ = 0.0;
+        speed_updated = true;
 
-      NODELET_DEBUG("Desired velocity: %f", desired_velocity_);
+        NODELET_INFO("Quick Brake Test: Make sure related SSC values are non-zero.");
+      }
     }
-
-    float steering = msg->axes.at((uint32_t)steering_axes_);
-    if ((steering > 0.01) || (steering < -0.01))
+    speed_last_ = 1;
+  }
+  else if (speed < -0.1)
+  {
+    if (speed_last_ != -1)
     {
-      float raw = steering * steering_sign_;
-      desired_curvature_ = std::copysign(std::pow(std::fabs(raw), steering_exponent_) * max_curvature_, raw);
-      steering_active_ = true;
+      desired_velocity_ -= speed_up_sign_ * speed_step_;
+      speed_updated = true;
     }
-    else if (steering_active_)
-    {
-      desired_curvature_ = 0.0;
-      steering_active_ = false;
-    }
-    else
-    {
-      float steer = msg->axes.at((uint32_t)steer_btn_axes_);
-      bool steer_updated = false;
-      if (steer > 0.1)
-      {
-        if (steer_last_ != 1)
-        {
-          desired_curvature_ += steer_btn_sign_ * steer_btn_step_;
-          steer_updated = true;
-        }
-        steer_last_ = 1;
-      }
-      else if (steer < -0.1)
-      {
-        if (steer_last_ != -1)
-        {
-          desired_curvature_ -= steer_btn_sign_ * steer_btn_step_;
-          steer_updated = true;
-        }
-        steer_last_ = -1;
-      }
-      else
-      {
-        steer_last_ = 0;
-      }
-
-      if (steer_updated)
-      {
-        desired_curvature_ = static_cast<float>(steer_btn_step_ * round(desired_curvature_ / steer_btn_step_));
-        desired_curvature_ = clamp(desired_curvature_, -max_curvature_, max_curvature_);
-        NODELET_DEBUG("Desired Curvature: %f", desired_curvature_);
-      }
-    }
+    speed_last_ = -1;
   }
   else
   {
-    desired_velocity_ = 0.0;
+    speed_last_ = 0;
+  }
+
+  float brake = msg->axes.at((uint32_t)brake_axes_);
+  if (brake != 0.0 || brake_initialized_)
+  {
+    brake_initialized_ = true;
+    brake *= brake_sign_;
+    if (brake < 0.95f)
+    {
+      if (!brake_active_)
+      {
+        brake_active_ = true;
+        desired_velocity_ = 0.0f;
+        speed_updated = true;
+      }
+      auto map2pt = [](float in, float min_in, float max_in, float min_out, float max_out) {  // NOLINT
+        float out;
+        if (in <= min_in)
+          out = min_out;
+        else if (in >= max_in)
+          out = max_out;
+        else
+          out = (in - min_in) / (max_in - min_in) * (max_out - min_out) + min_out;
+        return out;
+      };
+      deceleration_ = map2pt(brake, -0.95f, 0.95f, max_deceleration_limit_, deceleration_limit_);
+    }
+    else
+    {
+      if (brake_active_)
+      {
+        brake_active_ = false;
+        // convert from m/s to mph
+        desired_velocity_ = current_velocity_ / 0.44704f;
+        desired_velocity_ = static_cast<float>(speed_step_ * std::floor(desired_velocity_ / speed_step_));
+        speed_updated = true;
+        deceleration_ = deceleration_limit_;
+      }
+    }
+  }
+
+  if (speed_updated)
+  {
+    desired_velocity_ = static_cast<float>(speed_step_ * std::round(desired_velocity_ / speed_step_));
+
+    if (desired_velocity_ > max_speed_)
+    {
+      desired_velocity_ = max_speed_;
+    }
+    else if (desired_velocity_ < 0.1)
+    {
+      desired_velocity_ = 0.0;
+    }
+
+    NODELET_DEBUG("Desired velocity: %f", desired_velocity_);
+  }
+}
+
+void SscJoystickNl::createSteeringCommand(const sensor_msgs::Joy::ConstPtr& msg)
+{
+  float steering = msg->axes.at((uint32_t)steering_axes_);
+  if ((steering > 0.01) || (steering < -0.01))
+  {
+    float raw = steering * steering_sign_;
+    desired_curvature_ = std::copysign(std::pow(std::fabs(raw), steering_exponent_) * max_curvature_, raw);
+    steering_active_ = true;
+  }
+  else if (steering_active_)
+  {
     desired_curvature_ = 0.0;
+    steering_active_ = false;
+  }
+  else
+  {
+    float steer = msg->axes.at((uint32_t)steer_btn_axes_);
+    bool steer_updated = false;
+    if (steer > 0.1)
+    {
+      if (steer_last_ != 1)
+      {
+        desired_curvature_ += steer_btn_sign_ * steer_btn_step_;
+        steer_updated = true;
+      }
+      steer_last_ = 1;
+    }
+    else if (steer < -0.1)
+    {
+      if (steer_last_ != -1)
+      {
+        desired_curvature_ -= steer_btn_sign_ * steer_btn_step_;
+        steer_updated = true;
+      }
+      steer_last_ = -1;
+    }
+    else
+    {
+      steer_last_ = 0;
+    }
+
+    if (steer_updated)
+    {
+      desired_curvature_ = static_cast<float>(steer_btn_step_ * round(desired_curvature_ / steer_btn_step_));
+      desired_curvature_ = clamp(desired_curvature_, -max_curvature_, max_curvature_);
+      NODELET_DEBUG("Desired Curvature: %f", desired_curvature_);
+    }
+  }
+}
+
+void SscJoystickNl::createAuxCommand(const sensor_msgs::Joy::ConstPtr& msg)
+{
+  if (msg->buttons.at((uint32_t)right_turn_button_) > 0)
+  {
+    desired_turn_signal_ = automotive_platform_msgs::TurnSignalCommand::RIGHT;
+  }
+  else if (msg->buttons.at((uint32_t)left_turn_button_) > 0)
+  {
+    desired_turn_signal_ = automotive_platform_msgs::TurnSignalCommand::LEFT;
+  }
+  else
+  {
+    desired_turn_signal_ = automotive_platform_msgs::TurnSignalCommand::NONE;
   }
 }
 

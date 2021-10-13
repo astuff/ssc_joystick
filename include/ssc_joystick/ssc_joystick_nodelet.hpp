@@ -51,7 +51,12 @@ private:
   void loadParams();
 
   // Subscriber callbacks
-  void joystickCallback(const sensor_msgs::Joy::ConstPtr& joy_msg);
+  void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg);
+  void createEngageCommand(const sensor_msgs::Joy::ConstPtr& msg);
+  void createShiftCommand(const sensor_msgs::Joy::ConstPtr& msg);
+  void createSpeedCommand(const sensor_msgs::Joy::ConstPtr& msg);
+  void createSteeringCommand(const sensor_msgs::Joy::ConstPtr& msg);
+  void createAuxCommand(const sensor_msgs::Joy::ConstPtr& msg);
   void diagnosticCallback(const diagnostic_msgs::DiagnosticArray::ConstPtr& msg);
   void moduleStateCallback(const automotive_navigation_msgs::ModuleStateConstPtr& msg);
   void gearFeedbackCallback(const automotive_platform_msgs::GearFeedback::ConstPtr& msg);
