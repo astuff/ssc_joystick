@@ -1,6 +1,21 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package ssc_joystick
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Forthcoming
+-----------
+* Change DEBUG to INFO to restore previous behaviour (`#43 <https://github.com/astuff/ssc_joystick/issues/43>`_)
+* Update to Noetic CI (`#41 <https://github.com/astuff/ssc_joystick/issues/41>`_)
+* Break up joystick callback into separate functions (`#39 <https://github.com/astuff/ssc_joystick/issues/39>`_)
+* Update README and config params (`#37 <https://github.com/astuff/ssc_joystick/issues/37>`_)
+* Reorder the inclusion of header files in source files (`#36 <https://github.com/astuff/ssc_joystick/issues/36>`_)
+* Remove hexagon tractor vehicle specific code from the master branch (`#32 <https://github.com/astuff/ssc_joystick/issues/32>`_)
+* Add missing module_states callback  (`#31 <https://github.com/astuff/ssc_joystick/issues/31>`_)
+* Convert the code using ros nodelet (`#28 <https://github.com/astuff/ssc_joystick/issues/28>`_)
+* Update phrasing on disengage and override. `#26 <https://github.com/astuff/ssc_joystick/issues/26>`_ from astuff/fix/readme_update
+* Add controller image, update button defs. `#25 <https://github.com/astuff/ssc_joystick/issues/25>`_ from astuff/fix/readme_update
+* Feat/quick brake test `#24 <https://github.com/astuff/ssc_joystick/issues/24>`_ from astuff/feat/quick_brake_test
+* Contributors: Daniel-Stanek, Jilin Zhou, Sneha Ganesh, icolwell-as, jilinzhouas
+
 3.0.2 (2020-10-28)
 ------------------
 * Added Hexagon Tractor - based on https://github.com/astuff/astuff_sensor_msgs #edb3bf1 and https://github.com/astuff/pacmod3 #1425e64.
