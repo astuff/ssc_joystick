@@ -303,7 +303,7 @@ void SscJoystickNl::createSpeedCommand(const sensor_msgs::Joy::ConstPtr& msg)
       desired_velocity_ = 0.0;
     }
 
-    NODELET_DEBUG("Desired velocity: %f", desired_velocity_);
+    NODELET_INFO("Desired velocity: %f", desired_velocity_);
   }
 }
 
@@ -352,7 +352,7 @@ void SscJoystickNl::createSteeringCommand(const sensor_msgs::Joy::ConstPtr& msg)
     {
       desired_curvature_ = static_cast<float>(steer_btn_step_ * round(desired_curvature_ / steer_btn_step_));
       desired_curvature_ = clamp(desired_curvature_, -max_curvature_, max_curvature_);
-      NODELET_DEBUG("Desired Curvature: %f", desired_curvature_);
+      NODELET_INFO("Desired Curvature: %f", desired_curvature_);
     }
   }
 }
