@@ -1,8 +1,8 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package ssc_joystick
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Forthcoming
------------
+4.0.0 (2021-10-14)
+------------------
 * Change DEBUG to INFO to restore previous behaviour (`#43 <https://github.com/astuff/ssc_joystick/issues/43>`_)
 * Update to Noetic CI (`#41 <https://github.com/astuff/ssc_joystick/issues/41>`_)
 * Break up joystick callback into separate functions (`#39 <https://github.com/astuff/ssc_joystick/issues/39>`_)
