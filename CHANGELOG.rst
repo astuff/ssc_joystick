@@ -1,7 +1,7 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package ssc_joystick
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-4.0.0 (2021-10-14)
+4.0.0 (2021-10-15)
 ------------------
 * Change DEBUG to INFO to restore previous behaviour (`#43 <https://github.com/astuff/ssc_joystick/issues/43>`_)
 * Update to Noetic CI (`#41 <https://github.com/astuff/ssc_joystick/issues/41>`_)
