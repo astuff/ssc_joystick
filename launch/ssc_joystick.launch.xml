@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<launch>
+  <group>
+    <push-ros-namespace namespace="ssc"/>
+    <node pkg="joy" exec="joy_node" name="joystick">
+      <remap from="/diagnostics" to="/ssc/diagnostics" />
+      <param name="deadzone" value="0.01"/>
+      <param name="autorepeat_rate" value="20.0"/>
+    </node>
+
+    <node pkg="ssc_joystick" exec="ssc_joystick_exec" name="ssc_joystick" output="screen">
+      <param from="$(find-pkg-share ssc_joystick)/config/params.yaml"/>
+    </node>
+  </group>
+</launch>

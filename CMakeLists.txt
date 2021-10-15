@@ -1,76 +1,42 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.5)
 project(ssc_joystick)
 
-set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra ${CMAKE_CXX_FLAGS}")
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 14)
+endif()
 
-## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS
-  roslint
-  roscpp
-  nodelet
-  std_msgs
-  automotive_platform_msgs
-  automotive_navigation_msgs
-  joy
-)
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
 
-## Declare a catkin package
-catkin_package(CATKIN_DEPENDS
-    INCLUDE_DIRS include
-    CATKIN_DEPENDS ${catkin_deps}
-    LIBRARIES ${PROJECT_NAME}_nodelet
-)
+find_package(ament_cmake_auto REQUIRED)
+
+ament_auto_find_build_dependencies()
 
 ###########
 ## Build ##
 ###########
 
-## Build executables
-include_directories(
-  include
-  ${catkin_INCLUDE_DIRS}
+ament_auto_add_library(${PROJECT_NAME}_node SHARED
+  src/ssc_joystick.cpp
 )
 
-# nodelet
-add_library(${PROJECT_NAME}_nodelet
-    src/${PROJECT_NAME}_nodelet.cpp
+ament_auto_add_executable(${PROJECT_NAME}_exec
+  src/ssc_joystick_exec.cpp
 )
 
-target_link_libraries(${PROJECT_NAME}_nodelet
-    ${catkin_LIBRARIES}
-)
-
-# node
-add_executable(${PROJECT_NAME}_node
-    src/ssc_joystick_node.cpp
-)
-
-target_link_libraries(${PROJECT_NAME}_node
-    ${catkin_LIBRARIES}
-)
-
-roslint_cpp()
+# roslint_cpp()
 
 #############
 ## Install ##
 #############
 
-install(TARGETS
-    ${PROJECT_NAME}_node
-    ${PROJECT_NAME}_nodelet
-    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# Install
+install(FILES README.md
+  DESTINATION share/${PROJECT_NAME}/
 )
 
-install(DIRECTORY launch config
-    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
-
-install(FILES nodelets.xml
-    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
-
-install(DIRECTORY include/${PROJECT_NAME}/
-    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+ament_auto_package(INSTALL_TO_SHARE
+  launch
+  config
 )

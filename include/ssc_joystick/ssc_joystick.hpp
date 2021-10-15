@@ -23,72 +23,65 @@
 
 #include <string>
 
-#include <ros/ros.h>
-#include <nodelet/nodelet.h>
+#include <rclcpp/rclcpp.hpp>
 
-#include <sensor_msgs/Joy.h>
-#include <diagnostic_msgs/DiagnosticArray.h>
-#include <automotive_platform_msgs/GearCommand.h>
-#include <automotive_platform_msgs/GearFeedback.h>
-#include <automotive_platform_msgs/TurnSignalCommand.h>
-#include <automotive_platform_msgs/UserInputADAS.h>
-#include <automotive_platform_msgs/SpeedMode.h>
-#include <automotive_platform_msgs/SteerMode.h>
-#include <automotive_platform_msgs/VelocityAccelCov.h>
-#include <automotive_navigation_msgs/ModuleState.h>
+#include <automotive_navigation_msgs/msg/module_state.hpp>
+#include <automotive_platform_msgs/msg/gear_command.hpp>
+#include <automotive_platform_msgs/msg/gear_feedback.hpp>
+#include <automotive_platform_msgs/msg/speed_mode.hpp>
+#include <automotive_platform_msgs/msg/steer_mode.hpp>
+#include <automotive_platform_msgs/msg/turn_signal_command.hpp>
+#include <automotive_platform_msgs/msg/user_input_adas.hpp>
+#include <automotive_platform_msgs/msg/velocity_accel_cov.hpp>
+#include <diagnostic_msgs/msg/diagnostic_array.hpp>
+#include <sensor_msgs/msg/joy.hpp>
 
 namespace astuff
 {
-class SscJoystickNl : public nodelet::Nodelet
+class SscJoystickNode : public rclcpp::Node
 {
 public:
-  SscJoystickNl() = default;
-  virtual ~SscJoystickNl() = default;
+  SscJoystickNode();
 
 private:
   // Init
-  void onInit() override;
   void loadParams();
 
   // Subscriber callbacks
-  void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg);
-  void createEngageCommand(const sensor_msgs::Joy::ConstPtr& msg);
-  void createShiftCommand(const sensor_msgs::Joy::ConstPtr& msg);
-  void createSpeedCommand(const sensor_msgs::Joy::ConstPtr& msg);
-  void createSteeringCommand(const sensor_msgs::Joy::ConstPtr& msg);
-  void createAuxCommand(const sensor_msgs::Joy::ConstPtr& msg);
-  void diagnosticCallback(const diagnostic_msgs::DiagnosticArray::ConstPtr& msg);
-  void moduleStateCallback(const automotive_navigation_msgs::ModuleStateConstPtr& msg);
-  void gearFeedbackCallback(const automotive_platform_msgs::GearFeedback::ConstPtr& msg);
-  void velocityCallback(const automotive_platform_msgs::VelocityAccelCov::ConstPtr& msg);
-  void inputAdasCallback(const automotive_platform_msgs::UserInputADAS::ConstPtr& msg);
+  void joystickCallback(const sensor_msgs::msg::Joy::SharedPtr msg);
+  void createEngageCommand(const sensor_msgs::msg::Joy::SharedPtr msg);
+  void createShiftCommand(const sensor_msgs::msg::Joy::SharedPtr msg);
+  void createSpeedCommand(const sensor_msgs::msg::Joy::SharedPtr msg);
+  void createSteeringCommand(const sensor_msgs::msg::Joy::SharedPtr msg);
+  void createAuxCommand(const sensor_msgs::msg::Joy::SharedPtr msg);
+  void diagnosticCallback(const diagnostic_msgs::msg::DiagnosticArray::SharedPtr msg);
+  void moduleStateCallback(const automotive_navigation_msgs::msg::ModuleState::SharedPtr msg);
+  void gearFeedbackCallback(const automotive_platform_msgs::msg::GearFeedback::SharedPtr msg);
+  void velocityCallback(const automotive_platform_msgs::msg::VelocityAccelCov::SharedPtr msg);
+  void inputAdasCallback(const automotive_platform_msgs::msg::UserInputADAS::SharedPtr msg);
 
   // Publish vehicle command
-  void publishVehicleCommand(const ros::TimerEvent& event);
+  void publishVehicleCommand();
 
   void disengage();
   void tryToEngage();
 
-  // Nodehandles, both public and private
-  ros::NodeHandle nh_, pnh_;
-
   // Publishers
-  ros::Publisher gear_cmd_pub_;
-  ros::Publisher turn_signal_cmd_pub_;
-  ros::Publisher speed_cmd_pub_;
-  ros::Publisher steer_cmd_pub_;
-  ros::Publisher tractor_user_pub_;
+  rclcpp::Publisher<automotive_platform_msgs::msg::GearCommand>::SharedPtr gear_cmd_pub_;
+  rclcpp::Publisher<automotive_platform_msgs::msg::TurnSignalCommand>::SharedPtr turn_signal_cmd_pub_;
+  rclcpp::Publisher<automotive_platform_msgs::msg::SpeedMode>::SharedPtr speed_cmd_pub_;
+  rclcpp::Publisher<automotive_platform_msgs::msg::SteerMode>::SharedPtr steer_cmd_pub_;
 
   // Subscribers
-  ros::Subscriber module_state_sub_;
-  ros::Subscriber joy_sub_;
-  ros::Subscriber joy_fault_sub_;
-  ros::Subscriber gear_sub_;
-  ros::Subscriber velocity_sub_;
-  ros::Subscriber adas_input_sub_;
+  rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr joy_sub_;
+  rclcpp::Subscription<diagnostic_msgs::msg::DiagnosticArray>::SharedPtr joy_fault_sub_;
+  rclcpp::Subscription<automotive_platform_msgs::msg::GearFeedback>::SharedPtr gear_sub_;
+  rclcpp::Subscription<automotive_platform_msgs::msg::VelocityAccelCov>::SharedPtr velocity_sub_;
+  rclcpp::Subscription<automotive_platform_msgs::msg::UserInputADAS>::SharedPtr adas_input_sub_;
+  rclcpp::Subscription<automotive_navigation_msgs::msg::ModuleState>::SharedPtr module_state_sub_;
 
   // Timers
-  ros::Timer vehicle_cmd_timer_;
+  rclcpp::TimerBase::SharedPtr vehicle_cmd_timer_;
 
   bool engaged_ = false;
 
@@ -145,13 +138,13 @@ private:
   bool test_quick_brake_ = false;
   float quick_brake_speed_ = 0.0;
 
-  uint8_t current_gear_ = automotive_platform_msgs::Gear::NONE;
+  uint8_t current_gear_ = automotive_platform_msgs::msg::Gear::NONE;
   float current_velocity_ = 1.0;
 
   float desired_velocity_ = 0.0;
   float desired_curvature_ = 0.0;
-  uint8_t desired_gear_ = automotive_platform_msgs::Gear::NONE;
-  uint8_t desired_turn_signal_ = automotive_platform_msgs::TurnSignalCommand::NONE;
+  uint8_t desired_gear_ = automotive_platform_msgs::msg::Gear::NONE;
+  uint8_t desired_turn_signal_ = automotive_platform_msgs::msg::TurnSignalCommand::NONE;
 };
 
 }  // namespace astuff
