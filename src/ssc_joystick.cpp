@@ -29,20 +29,16 @@ namespace astuff
 {
 namespace
 {
-template <typename T>
+template<typename T>
 T clamp(const T value, T bound1, T bound2)
 {
-  if (bound1 > bound2)
-  {
+  if (bound1 > bound2) {
     std::swap(bound1, bound2);
   }
 
-  if (value < bound1)
-  {
+  if (value < bound1) {
     return bound1;
-  }
-  else if (value > bound2)
-  {
+  } else if (value > bound2) {
     return bound2;
   }
   return value;
@@ -51,7 +47,8 @@ T clamp(const T value, T bound1, T bound2)
 
 using std::placeholders::_1;
 
-SscJoystickNode::SscJoystickNode() : Node("ssc_joystick")
+SscJoystickNode::SscJoystickNode()
+: Node("ssc_joystick")
 {
   loadParams();
 
@@ -59,21 +56,38 @@ SscJoystickNode::SscJoystickNode() : Node("ssc_joystick")
   last_joystick_msg_timestamp_ = this->now().seconds() + 5.0;
 
   // Publishers
-  gear_cmd_pub_ = this->create_publisher<automotive_platform_msgs::msg::GearCommand>("gear_select", 1);
-  turn_signal_cmd_pub_ = this->create_publisher<automotive_platform_msgs::msg::TurnSignalCommand>("turn_signal_command", 1);
-  speed_cmd_pub_ = this->create_publisher<automotive_platform_msgs::msg::SpeedMode>("arbitrated_speed_commands", 1);
-  steer_cmd_pub_ = this->create_publisher<automotive_platform_msgs::msg::SteerMode>("arbitrated_steering_commands", 1);
+  gear_cmd_pub_ = this->create_publisher<automotive_platform_msgs::msg::GearCommand>(
+    "gear_select",
+    1);
+  turn_signal_cmd_pub_ = this->create_publisher<automotive_platform_msgs::msg::TurnSignalCommand>(
+    "turn_signal_command", 1);
+  speed_cmd_pub_ = this->create_publisher<automotive_platform_msgs::msg::SpeedMode>(
+    "arbitrated_speed_commands", 1);
+  steer_cmd_pub_ = this->create_publisher<automotive_platform_msgs::msg::SteerMode>(
+    "arbitrated_steering_commands", 1);
 
   // Subscribers
-  joy_sub_ = this->create_subscription<sensor_msgs::msg::Joy>("joy", 10, std::bind(&SscJoystickNode::joystickCallback, this, _1));
-  joy_fault_sub_ = this->create_subscription<diagnostic_msgs::msg::DiagnosticArray>("diagnostics", 10, std::bind(&SscJoystickNode::diagnosticCallback, this, _1));
-  gear_sub_ = this->create_subscription<automotive_platform_msgs::msg::GearFeedback>("gear_feedback", 10, std::bind(&SscJoystickNode::gearFeedbackCallback, this, _1));
-  velocity_sub_ = this->create_subscription<automotive_platform_msgs::msg::VelocityAccelCov>("velocity_accel_cov", 10, std::bind(&SscJoystickNode::velocityCallback, this, _1));
-  adas_input_sub_ = this->create_subscription<automotive_platform_msgs::msg::UserInputADAS>("adas_input", 10, std::bind(&SscJoystickNode::inputAdasCallback, this, _1));
-  module_state_sub_ = this->create_subscription<automotive_navigation_msgs::msg::ModuleState>("module_states", 10, std::bind(&SscJoystickNode::moduleStateCallback, this, _1));
+  joy_sub_ =
+    this->create_subscription<sensor_msgs::msg::Joy>(
+    "joy", 10,
+    std::bind(&SscJoystickNode::joystickCallback, this, _1));
+  joy_fault_sub_ = this->create_subscription<diagnostic_msgs::msg::DiagnosticArray>(
+    "diagnostics",
+    10,
+    std::bind(&SscJoystickNode::diagnosticCallback, this, _1));
+  gear_sub_ = this->create_subscription<automotive_platform_msgs::msg::GearFeedback>(
+    "gear_feedback", 10, std::bind(&SscJoystickNode::gearFeedbackCallback, this, _1));
+  velocity_sub_ = this->create_subscription<automotive_platform_msgs::msg::VelocityAccelCov>(
+    "velocity_accel_cov", 10, std::bind(&SscJoystickNode::velocityCallback, this, _1));
+  adas_input_sub_ = this->create_subscription<automotive_platform_msgs::msg::UserInputADAS>(
+    "adas_input", 10, std::bind(&SscJoystickNode::inputAdasCallback, this, _1));
+  module_state_sub_ = this->create_subscription<automotive_navigation_msgs::msg::ModuleState>(
+    "module_states", 10, std::bind(&SscJoystickNode::moduleStateCallback, this, _1));
 
   // Vehicle command timer
-  vehicle_cmd_timer_ = this->create_wall_timer(std::chrono::duration<float>(publish_interval_), std::bind(&SscJoystickNode::publishVehicleCommand, this));
+  vehicle_cmd_timer_ = this->create_wall_timer(
+    std::chrono::duration<float>(
+      publish_interval_), std::bind(&SscJoystickNode::publishVehicleCommand, this));
   RCLCPP_INFO(this->get_logger(), "ssc_joystick initialized");
 }
 
@@ -82,7 +96,9 @@ void SscJoystickNode::loadParams()
   publish_interval_ = this->declare_parameter("publish_interval", 0.05f);
   joystick_fault_timeout_ = this->declare_parameter("joystick_fault_timeout", 3.0f);
 
-  veh_controller_name_ = this->declare_parameter<std::string>("veh_controller_name", "/ssc/veh_controller");
+  veh_controller_name_ = this->declare_parameter<std::string>(
+    "veh_controller_name",
+    "/ssc/veh_controller");
 
   engage_speed_module_ = this->declare_parameter("engage_speed_module", true);
   engage_steering_module_ = this->declare_parameter("engage_steering_module", true);
@@ -122,17 +138,15 @@ void SscJoystickNode::loadParams()
 
   RCLCPP_INFO(this->get_logger(), "Parameters Loaded");
 
-  if (engage_speed_module_ || engage_steering_module_)
-  {
-    RCLCPP_INFO(this->get_logger(), "SPEED MODULE MODE: %d STEERING MODULE MODE: %d", engage_speed_module_, engage_steering_module_);
+  if (engage_speed_module_ || engage_steering_module_) {
+    RCLCPP_INFO(
+      this->get_logger(), "SPEED MODULE MODE: %d STEERING MODULE MODE: %d", engage_speed_module_,
+      engage_steering_module_);
 
-    if (engage_speed_module_ && engage_steering_module_)
-    {
+    if (engage_speed_module_ && engage_steering_module_) {
       RCLCPP_INFO(this->get_logger(), "SPEED AND STEERING CONTROL SET TO ENGAGE");
     }
-  }
-  else
-  {
+  } else {
     RCLCPP_WARN(this->get_logger(), "NO MODULE HAS BEEN SET TO ENGAGE, SSC WILL NOT BE ACTIVE");
   }
 }
@@ -141,15 +155,12 @@ void SscJoystickNode::joystickCallback(const sensor_msgs::msg::Joy::SharedPtr ms
 {
   createEngageCommand(msg);
 
-  if (engaged_)
-  {
+  if (engaged_) {
     createShiftCommand(msg);
     createSpeedCommand(msg);
     createSteeringCommand(msg);
     createAuxCommand(msg);
-  }
-  else
-  {
+  } else {
     desired_velocity_ = 0.0;
     desired_curvature_ = 0.0;
   }
@@ -157,58 +168,42 @@ void SscJoystickNode::joystickCallback(const sensor_msgs::msg::Joy::SharedPtr ms
 
 void SscJoystickNode::createEngageCommand(const sensor_msgs::msg::Joy::SharedPtr msg)
 {
-  if ((msg->buttons.at((uint32_t)engage1_button_) > 0) && (msg->buttons.at((uint32_t)engage2_button_) > 0))
+  if ((msg->buttons.at((uint32_t)engage1_button_) > 0) &&
+    (msg->buttons.at((uint32_t)engage2_button_) > 0))
   {
-    if (!engage_pressed_)
-    {
-      if (engaged_)
-      {
+    if (!engage_pressed_) {
+      if (engaged_) {
         disengage();
-      }
-      else
-      {
+      } else {
         tryToEngage();
       }
       engage_pressed_ = true;
     }
-  }
-  else if ((msg->buttons.at((uint32_t)engage1_button_) > 0) || (msg->buttons.at((uint32_t)engage2_button_) > 0))
+  } else if ((msg->buttons.at((uint32_t)engage1_button_) > 0) ||
+    (msg->buttons.at((uint32_t)engage2_button_) > 0))
   {
-    if (engaged_ && !engage_pressed_)
-    {
+    if (engaged_ && !engage_pressed_) {
       disengage();
       engage_pressed_ = true;
     }
-  }
-  else
-  {
+  } else {
     engage_pressed_ = false;
   }
 }
 
 void SscJoystickNode::createShiftCommand(const sensor_msgs::msg::Joy::SharedPtr msg)
 {
-  if (msg->buttons.at((uint32_t)park_button_) > 0)
-  {
-    if (current_velocity_ > 0.1)
-    {
+  if (msg->buttons.at((uint32_t)park_button_) > 0) {
+    if (current_velocity_ > 0.1) {
       RCLCPP_WARN(this->get_logger(), "Must be stopped to change to park");
-    }
-    else
-    {
+    } else {
       desired_gear_ = automotive_platform_msgs::msg::Gear::PARK;
     }
-  }
-  else if (msg->buttons.at((uint32_t)neutral_button_) > 0)
-  {
+  } else if (msg->buttons.at((uint32_t)neutral_button_) > 0) {
     desired_gear_ = automotive_platform_msgs::msg::Gear::NEUTRAL;
-  }
-  else if (msg->buttons.at((uint32_t)drive_button_) > 0)
-  {
+  } else if (msg->buttons.at((uint32_t)drive_button_) > 0) {
     desired_gear_ = automotive_platform_msgs::msg::Gear::DRIVE;
-  }
-  else if (msg->buttons.at((uint32_t)reverse_button_) > 0)
-  {
+  } else if (msg->buttons.at((uint32_t)reverse_button_) > 0) {
     desired_gear_ = automotive_platform_msgs::msg::Gear::REVERSE;
   }
 }
@@ -217,89 +212,73 @@ void SscJoystickNode::createSpeedCommand(const sensor_msgs::msg::Joy::SharedPtr 
 {
   float speed = msg->axes.at((uint32_t)speed_axes_);
   bool speed_updated = false;
-  if (speed > 0.1)
-  {
-    if (speed_last_ != 1)
-    {
-      if (!test_quick_brake_ || (test_quick_brake_ && (desired_velocity_ < quick_brake_speed_)))
-      {
+  if (speed > 0.1) {
+    if (speed_last_ != 1) {
+      if (!test_quick_brake_ || (test_quick_brake_ && (desired_velocity_ < quick_brake_speed_))) {
         desired_velocity_ += speed_up_sign_ * speed_step_;
         speed_updated = true;
-      }
-      else if (test_quick_brake_ && (desired_velocity_ > quick_brake_speed_))
-      {
+      } else if (test_quick_brake_ && (desired_velocity_ > quick_brake_speed_)) {
         desired_velocity_ = 0.0;
         deceleration_ = 0.0;
         speed_updated = true;
 
-        RCLCPP_INFO(this->get_logger(), "Quick Brake Test: Make sure related SSC values are non-zero.");
+        RCLCPP_INFO(
+          this->get_logger(), "Quick Brake Test: Make sure related SSC values are non-zero.");
       }
     }
     speed_last_ = 1;
-  }
-  else if (speed < -0.1)
-  {
-    if (speed_last_ != -1)
-    {
+  } else if (speed < -0.1) {
+    if (speed_last_ != -1) {
       desired_velocity_ -= speed_up_sign_ * speed_step_;
       speed_updated = true;
     }
     speed_last_ = -1;
-  }
-  else
-  {
+  } else {
     speed_last_ = 0;
   }
 
   float brake = msg->axes.at((uint32_t)brake_axes_);
-  if (brake != 0.0 || brake_initialized_)
-  {
+  if (brake != 0.0 || brake_initialized_) {
     brake_initialized_ = true;
     brake *= brake_sign_;
-    if (brake < 0.95f)
-    {
-      if (!brake_active_)
-      {
+    if (brake < 0.95f) {
+      if (!brake_active_) {
         brake_active_ = true;
         desired_velocity_ = 0.0f;
         speed_updated = true;
       }
       auto map2pt = [](float in, float min_in, float max_in, float min_out, float max_out) {  // NOLINT
-        float out;
-        if (in <= min_in)
-          out = min_out;
-        else if (in >= max_in)
-          out = max_out;
-        else
-          out = (in - min_in) / (max_in - min_in) * (max_out - min_out) + min_out;
-        return out;
-      };
+          float out;
+          if (in <= min_in) {
+            out = min_out;
+          } else if (in >= max_in) {
+            out = max_out;
+          } else {
+            out = (in - min_in) / (max_in - min_in) * (max_out - min_out) + min_out;
+          }
+          return out;
+        };
       deceleration_ = map2pt(brake, -0.95f, 0.95f, max_deceleration_limit_, deceleration_limit_);
-    }
-    else
-    {
-      if (brake_active_)
-      {
+    } else {
+      if (brake_active_) {
         brake_active_ = false;
         // convert from m/s to mph
         desired_velocity_ = current_velocity_ / 0.44704f;
-        desired_velocity_ = static_cast<float>(speed_step_ * std::floor(desired_velocity_ / speed_step_));
+        desired_velocity_ =
+          static_cast<float>(speed_step_ * std::floor(desired_velocity_ / speed_step_));
         speed_updated = true;
         deceleration_ = deceleration_limit_;
       }
     }
   }
 
-  if (speed_updated)
-  {
-    desired_velocity_ = static_cast<float>(speed_step_ * std::round(desired_velocity_ / speed_step_));
+  if (speed_updated) {
+    desired_velocity_ =
+      static_cast<float>(speed_step_ * std::round(desired_velocity_ / speed_step_));
 
-    if (desired_velocity_ > max_speed_)
-    {
+    if (desired_velocity_ > max_speed_) {
       desired_velocity_ = max_speed_;
-    }
-    else if (desired_velocity_ < 0.1)
-    {
+    } else if (desired_velocity_ < 0.1) {
       desired_velocity_ = 0.0;
     }
 
@@ -310,47 +289,38 @@ void SscJoystickNode::createSpeedCommand(const sensor_msgs::msg::Joy::SharedPtr 
 void SscJoystickNode::createSteeringCommand(const sensor_msgs::msg::Joy::SharedPtr msg)
 {
   float steering = msg->axes.at((uint32_t)steering_axes_);
-  if ((steering > 0.01) || (steering < -0.01))
-  {
+  if ((steering > 0.01) || (steering < -0.01)) {
     float raw = steering * steering_sign_;
-    desired_curvature_ = std::copysign(std::pow(std::fabs(raw), steering_exponent_) * max_curvature_, raw);
+    desired_curvature_ = std::copysign(
+      std::pow(
+        std::fabs(
+          raw), steering_exponent_) * max_curvature_, raw);
     steering_active_ = true;
-  }
-  else if (steering_active_)
-  {
+  } else if (steering_active_) {
     desired_curvature_ = 0.0;
     steering_active_ = false;
-  }
-  else
-  {
+  } else {
     float steer = msg->axes.at((uint32_t)steer_btn_axes_);
     bool steer_updated = false;
-    if (steer > 0.1)
-    {
-      if (steer_last_ != 1)
-      {
+    if (steer > 0.1) {
+      if (steer_last_ != 1) {
         desired_curvature_ += steer_btn_sign_ * steer_btn_step_;
         steer_updated = true;
       }
       steer_last_ = 1;
-    }
-    else if (steer < -0.1)
-    {
-      if (steer_last_ != -1)
-      {
+    } else if (steer < -0.1) {
+      if (steer_last_ != -1) {
         desired_curvature_ -= steer_btn_sign_ * steer_btn_step_;
         steer_updated = true;
       }
       steer_last_ = -1;
-    }
-    else
-    {
+    } else {
       steer_last_ = 0;
     }
 
-    if (steer_updated)
-    {
-      desired_curvature_ = static_cast<float>(steer_btn_step_ * round(desired_curvature_ / steer_btn_step_));
+    if (steer_updated) {
+      desired_curvature_ =
+        static_cast<float>(steer_btn_step_ * round(desired_curvature_ / steer_btn_step_));
       desired_curvature_ = clamp(desired_curvature_, -max_curvature_, max_curvature_);
       RCLCPP_INFO(this->get_logger(), "Desired Curvature: %f", desired_curvature_);
     }
@@ -359,29 +329,21 @@ void SscJoystickNode::createSteeringCommand(const sensor_msgs::msg::Joy::SharedP
 
 void SscJoystickNode::createAuxCommand(const sensor_msgs::msg::Joy::SharedPtr msg)
 {
-  if (msg->buttons.at((uint32_t)right_turn_button_) > 0)
-  {
+  if (msg->buttons.at((uint32_t)right_turn_button_) > 0) {
     desired_turn_signal_ = automotive_platform_msgs::msg::TurnSignalCommand::RIGHT;
-  }
-  else if (msg->buttons.at((uint32_t)left_turn_button_) > 0)
-  {
+  } else if (msg->buttons.at((uint32_t)left_turn_button_) > 0) {
     desired_turn_signal_ = automotive_platform_msgs::msg::TurnSignalCommand::LEFT;
-  }
-  else
-  {
+  } else {
     desired_turn_signal_ = automotive_platform_msgs::msg::TurnSignalCommand::NONE;
   }
 }
 
 void SscJoystickNode::diagnosticCallback(const diagnostic_msgs::msg::DiagnosticArray::SharedPtr msg)
 {
-  for (auto it = msg->status.begin(); it < msg->status.end(); it++)
-  {
-    if (it->name.find("Joystick Driver Status") != std::string::npos)
-    {
+  for (auto it = msg->status.begin(); it < msg->status.end(); it++) {
+    if (it->name.find("Joystick Driver Status") != std::string::npos) {
       last_joystick_msg_timestamp_ = msg->header.stamp.sec;
-      if (it->level != diagnostic_msgs::msg::DiagnosticStatus::OK)
-      {
+      if (it->level != diagnostic_msgs::msg::DiagnosticStatus::OK) {
         RCLCPP_WARN(this->get_logger(), "JOYSTICK FAULT");
         engaged_ = 0;
         brake_initialized_ = false;
@@ -391,27 +353,26 @@ void SscJoystickNode::diagnosticCallback(const diagnostic_msgs::msg::DiagnosticA
   }
 }
 
-void SscJoystickNode::gearFeedbackCallback(const automotive_platform_msgs::msg::GearFeedback::SharedPtr msg)
+void SscJoystickNode::gearFeedbackCallback(
+  const automotive_platform_msgs::msg::GearFeedback::SharedPtr msg)
 {
   current_gear_ = msg->current_gear.gear;
 }
 
-void SscJoystickNode::velocityCallback(const automotive_platform_msgs::msg::VelocityAccelCov::SharedPtr msg)
+void SscJoystickNode::velocityCallback(
+  const automotive_platform_msgs::msg::VelocityAccelCov::SharedPtr msg)
 {
   current_velocity_ = msg->velocity;
 }
 
-void SscJoystickNode::inputAdasCallback(const automotive_platform_msgs::msg::UserInputADAS::SharedPtr msg)
+void SscJoystickNode::inputAdasCallback(
+  const automotive_platform_msgs::msg::UserInputADAS::SharedPtr msg)
 {
-  if (msg->btn_cc_set_inc && msg->btn_acc_gap_inc)
-  {
-    if (engaged_ > 0)
-    {
+  if (msg->btn_cc_set_inc && msg->btn_acc_gap_inc) {
+    if (engaged_ > 0) {
       disengage();
     }
-  }
-  else if (msg->btn_cc_set_dec && msg->btn_acc_gap_dec)
-  {
+  } else if (msg->btn_cc_set_dec && msg->btn_acc_gap_dec) {
     tryToEngage();
   }
 }
@@ -424,17 +385,13 @@ void SscJoystickNode::disengage()
 
 void SscJoystickNode::tryToEngage()
 {
-  if (!dbw_ok_)
-  {
+  if (!dbw_ok_) {
     RCLCPP_INFO(this->get_logger(), "Drive by wire system not ready to engage");
-  }
-  else if ((current_gear_ != automotive_platform_msgs::msg::Gear::PARK) &&
-           (current_gear_ != automotive_platform_msgs::msg::Gear::NEUTRAL))
+  } else if ((current_gear_ != automotive_platform_msgs::msg::Gear::PARK) &&
+    (current_gear_ != automotive_platform_msgs::msg::Gear::NEUTRAL))
   {
     RCLCPP_WARN(this->get_logger(), "Gear must be in park or neutral to engage");
-  }
-  else
-  {
+  } else {
     RCLCPP_INFO(this->get_logger(), "Engaged");
     desired_velocity_ = 0.0;
     desired_curvature_ = 0.0;
@@ -443,33 +400,27 @@ void SscJoystickNode::tryToEngage()
   }
 }
 
-void SscJoystickNode::moduleStateCallback(const automotive_navigation_msgs::msg::ModuleState::SharedPtr msg)
+void SscJoystickNode::moduleStateCallback(
+  const automotive_navigation_msgs::msg::ModuleState::SharedPtr msg)
 {
-  if (msg->name == veh_controller_name_)
-  {
-    if (msg->state == "not_ready")
-    {
+  if (msg->name == veh_controller_name_) {
+    if (msg->state == "not_ready") {
       dbw_ok_ = false;
-    }
-    else if ((msg->state == "ready") || (msg->state == "engaged") || (msg->state == "active"))
-    {
+    } else if ((msg->state == "ready") || (msg->state == "engaged") || (msg->state == "active")) {
       dbw_ok_ = true;
-    }
-    else if (msg->state == "failure")
-    {
-      if (dbw_ok_ && (engaged_ > 0))
-      {
+    } else if (msg->state == "failure") {
+      if (dbw_ok_ && (engaged_ > 0)) {
         RCLCPP_WARN(this->get_logger(), "Joystick control DISENGAGED due to %s", msg->info.c_str());
         engaged_ = 0;
       }
       dbw_ok_ = false;
-    }
-    else if (msg->state == "fatal")
-    {
-      if (dbw_ok_)
-      {
-        RCLCPP_WARN(this->get_logger(), "Joystick control unavailable due to %s", msg->info.c_str());
-        RCLCPP_WARN(this->get_logger(), "Software must be stopped and restarted once the problem is fixed");
+    } else if (msg->state == "fatal") {
+      if (dbw_ok_) {
+        RCLCPP_WARN(
+          this->get_logger(), "Joystick control unavailable due to %s",
+          msg->info.c_str());
+        RCLCPP_WARN(
+          this->get_logger(), "Software must be stopped and restarted once the problem is fixed");
         engaged_ = 0;
       }
       dbw_ok_ = false;
@@ -480,8 +431,7 @@ void SscJoystickNode::moduleStateCallback(const automotive_navigation_msgs::msg:
 void SscJoystickNode::publishVehicleCommand()
 {
   auto current_time = this->now();
-  if (current_time.seconds() - last_joystick_msg_timestamp_ > joystick_fault_timeout_)
-  {
+  if (current_time.seconds() - last_joystick_msg_timestamp_ > joystick_fault_timeout_) {
     // Joystick has timed out
     RCLCPP_WARN(this->get_logger(), "JOYSTICK TIMEOUT");
     last_joystick_msg_timestamp_ = current_time.seconds();
@@ -509,12 +459,10 @@ void SscJoystickNode::publishVehicleCommand()
 
   automotive_platform_msgs::msg::TurnSignalCommand turn_signal_cmd_msg;
   if (desired_turn_signal_ == automotive_platform_msgs::msg::TurnSignalCommand::LEFT ||
-      desired_turn_signal_ == automotive_platform_msgs::msg::TurnSignalCommand::RIGHT)
+    desired_turn_signal_ == automotive_platform_msgs::msg::TurnSignalCommand::RIGHT)
   {
     turn_signal_cmd_msg.mode = 1;
-  }
-  else
-  {
+  } else {
     turn_signal_cmd_msg.mode = 0;
   }
   turn_signal_cmd_msg.turn_signal = desired_turn_signal_;

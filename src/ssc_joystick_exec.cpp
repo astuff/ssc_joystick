@@ -20,7 +20,7 @@
 
 #include "ssc_joystick/ssc_joystick.hpp"
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
   auto node = std::make_shared<astuff::SscJoystickNode>();

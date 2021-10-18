@@ -68,7 +68,8 @@ private:
 
   // Publishers
   rclcpp::Publisher<automotive_platform_msgs::msg::GearCommand>::SharedPtr gear_cmd_pub_;
-  rclcpp::Publisher<automotive_platform_msgs::msg::TurnSignalCommand>::SharedPtr turn_signal_cmd_pub_;
+  rclcpp::Publisher<automotive_platform_msgs::msg::TurnSignalCommand>::SharedPtr
+    turn_signal_cmd_pub_;
   rclcpp::Publisher<automotive_platform_msgs::msg::SpeedMode>::SharedPtr speed_cmd_pub_;
   rclcpp::Publisher<automotive_platform_msgs::msg::SteerMode>::SharedPtr steer_cmd_pub_;
 
