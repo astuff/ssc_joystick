@@ -25,7 +25,14 @@ ament_auto_add_executable(${PROJECT_NAME}_exec
   src/ssc_joystick_exec.cpp
 )
 
-# roslint_cpp()
+##########
+## Test ##
+##########
+
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
+endif()
 
 #############
 ## Install ##
