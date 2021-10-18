@@ -30,9 +30,8 @@ ament_auto_add_executable(${PROJECT_NAME}_exec
 ##########
 
 if(BUILD_TESTING)
-  find_package(ament_lint_auto REQUIRED)
+  find_package(ament_cmake_uncrustify REQUIRED)
   ament_uncrustify()
-  ament_xmllint()
 endif()
 
 #############
