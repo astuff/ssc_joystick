@@ -18,8 +18,8 @@
  * MAY DESCRIBE, IN WHOLE OR IN PART.
  */
 
-#ifndef SSC_JOYSTICK_H
-#define SSC_JOYSTICK_H
+#ifndef SSC_JOYSTICK__SSC_JOYSTICK_HPP_
+#define SSC_JOYSTICK__SSC_JOYSTICK_HPP_
 
 #include <string>
 
@@ -149,4 +149,4 @@ private:
 };
 
 }  // namespace astuff
-#endif  // SSC_JOYSTICK_H
+#endif  // SSC_JOYSTICK__SSC_JOYSTICK_HPP_
