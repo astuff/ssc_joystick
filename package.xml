@@ -1,27 +1,33 @@
 <?xml version="1.0"?>
-<package format="2">
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
   <name>ssc_joystick</name>
   <version>4.0.0</version>
-  <description>Passes driver command from a joystick to the speed and steering control modules</description>
+  <description>Passes driver commands from a joystick to the speed and steering control modules</description>
   <license>MIT</license>
+
+  <url type="website">https://github.com/astuff/ssc_joystick</url>
+  <url type="repository">https://github.com/astuff/ssc_joystick</url>
+  <url type="bugtracker">https://github.com/astuff/ssc_joystick/issues</url>
 
   <maintainer email="support.as.ap@hexagon.com">AutonomouStuff Support Team</maintainer>
   <author email="daniel.stanek@hexagon.com">Daniel Stanek</author>
   <author email="sneha.ganesh@hexagon.com">Sneha Ganesh</author>
   <author email="jilin.zhou@autonomoustuff.com">Jilin Zhou</author>
 
-  <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>roslint</build_depend>
+  <buildtool_depend>ament_cmake_auto</buildtool_depend>
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
 
-  <depend>roscpp</depend>
-  <depend>nodelet</depend>
-  <depend>std_msgs</depend>
-  <depend>sensor_msgs</depend>
-  <depend>automotive_platform_msgs</depend>
+  <depend>rclcpp</depend>
+  <depend>rclcpp_components</depend>
+
   <depend>automotive_navigation_msgs</depend>
-  <depend>joy</depend>
+  <depend>automotive_platform_msgs</depend>
+  <depend>diagnostic_msgs</depend>
+  <depend>sensor_msgs</depend>
 
-  <export>
-    <nodelet plugin="${prefix}/nodelets.xml"/>
-  </export>
+  <exec_depend>joy</exec_depend>
+
+  <export><build_type>ament_cmake</build_type></export>
 </package>

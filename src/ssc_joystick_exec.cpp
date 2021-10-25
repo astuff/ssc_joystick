@@ -18,16 +18,15 @@
  * MAY DESCRIBE, IN WHOLE OR IN PART.
  */
 
-#include <ros/ros.h>
-#include <nodelet/loader.h>
+#include "ssc_joystick/ssc_joystick.hpp"
 
-int main(int argc, char** argv)
+#include <memory>
+
+int main(int argc, char ** argv)
 {
-  ros::init(argc, argv, "ssc_joystick_node");
-  nodelet::Loader nodelet;
-  nodelet::M_string remap(ros::names::getRemappings());
-  nodelet::V_string nargv;
-  nodelet.load(ros::this_node::getName(), "ssc_joystick/ssc_joystick_nodelet", remap, nargv);
-  ros::spin();
+  rclcpp::init(argc, argv);
+  auto node = std::make_shared<astuff::SscJoystickNode>();
+  rclcpp::spin(node);
+
   return 0;
 }
