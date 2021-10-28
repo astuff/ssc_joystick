@@ -1,6 +1,12 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package ssc_joystick
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2004.0.0 (2021-10-27)
+---------------------
+* Use joy_linux instead of joy due to diagnostics support (`#48 <https://github.com/astuff/ssc_joystick/issues/48>`_)
+* Port to ROS2 (`#46 <https://github.com/astuff/ssc_joystick/issues/46>`_)
+* Contributors: icolwell-as
+
 4.0.0 (2021-10-15)
 ------------------
 * Change DEBUG to INFO to restore previous behaviour (`#43 <https://github.com/astuff/ssc_joystick/issues/43>`_)
